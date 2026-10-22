@@ -29,11 +29,42 @@ const NOTA = [
   'Emissão: 20/10/2026 18:42:10',
 ].join('\n');
 
+/** O que o robô publicaria hoje para Koch e Angeloni (o teste não depende da internet). */
+function precosDeHoje() {
+  const data = new Date().toISOString();
+  const loja = itens => ({ data, itens });
+  return {
+    versao: 1,
+    geradoEm: data,
+    lojas: {
+      koch: loja({
+        arroz: [{ tamanho: 1000, preco: 3.79, nome: 'Arroz Kika Branco Pacote 1Kg' }],
+        feijao_preto: [{ tamanho: 1000, preco: 6.99, nome: 'Feijão Preto Kicaldo Tipo 1 1Kg' }],
+        ovos: [{ tamanho: 12, preco: 9.49, nome: 'Ovos Brancos Grandes Dúzia' }, { tamanho: 30, preco: 19.9, nome: 'Ovos Brancos Bandeja 30 Unidades' }],
+        tomate: [{ tamanho: 1, preco: 1.68, kg: 13.99, nome: 'Tomate Longa Vida Kg', promo: true }],
+        cebola: [{ tamanho: 1, preco: 1.2, kg: 7.99, nome: 'Cebola Kg' }],
+        banana: [{ tamanho: 1, preco: 0.66, kg: 5.99, nome: 'Banana Caturra Kg' }],
+        leite: [{ tamanho: 1000, preco: 4.99, nome: 'Leite UHT Integral Tirol 1L' }],
+        peito_frango: [{ tamanho: 1000, preco: 21.9, nome: 'Filé de Peito de Frango Congelado Sadia 1Kg' }],
+      }),
+      angeloni: loja({
+        arroz: [{ tamanho: 1000, preco: 4.29, nome: 'Arroz Branco Tipo 1 Prato Fino 1kg' }, { tamanho: 5000, preco: 21.9, nome: 'Arroz Branco Tipo 1 Prato Fino 5kg' }],
+        tomate: [{ tamanho: 1, preco: 1.79, kg: 14.89, nome: 'Tomate Kg' }],
+        cebola: [{ tamanho: 1, preco: 1.34, kg: 8.95, nome: 'Cebola Kg' }],
+        leite: [{ tamanho: 1000, preco: 5.29, nome: 'Leite UHT Integral Piracanjuba 1l' }],
+      }),
+    },
+  };
+}
+
 async function main() {
   await new Promise(r => servidor.listen(0, r));
   const base = `http://127.0.0.1:${servidor.address().port}`;
   const browser = await chromium.launch();
   const contexto = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: 'pt-BR' });
+  await contexto.route('**/abreuhans/rendeu/precos/precos.json', r => r.fulfill({
+    contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(precosDeHoje()),
+  }));
   const page = await contexto.newPage();
   const erros = [];
   page.on('pageerror', e => erros.push('pageerror: ' + e.message));
@@ -48,6 +79,7 @@ async function main() {
     await page.goto(base + '/');
     await page.getByText('Receitas que cabem no seu bolso').waitFor();
     await page.getByText('Exemplo: R$ 150').waitFor({ timeout: 15000 });
+    await page.getByText(/Preços dos sites de Koch e Angeloni, lidos hoje às/).waitFor({ timeout: 15000 });
     await foto('01-inicio');
   });
 
@@ -108,12 +140,14 @@ async function main() {
     await page.getByRole('tab', { name: 'Compras' }).click();
     await page.getByText('Lista de compras', { exact: true }).waitFor();
     await page.getByText('TOTAL', { exact: true }).waitFor();
+    await page.getByText(/\d+ itens · (preços estimados|\d+ do site)/).waitFor();
     const primeiro = page.getByRole('checkbox').first();
     await primeiro.click();
     if ((await primeiro.getAttribute('aria-checked')) !== 'true') throw new Error('item não ficou marcado');
     await foto('07-compras');
     await page.getByRole('tab', { name: 'Mercados' }).click();
     await page.getByText('A mesma lista em cada mercado').waitFor();
+    await page.getByText(/^site · hoje às/).first().waitFor();
     await page.getByRole('tab', { name: 'Bastidores' }).click();
     await page.getByText(/O que acontece quando você toca/).waitFor();
   });

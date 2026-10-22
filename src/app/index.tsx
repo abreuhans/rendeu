@@ -1,8 +1,9 @@
 import { router, Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
-import { dinheiro, planejar, RECEITA, type Plano } from '@/core';
+import { dinheiro, planejarSemTravar, RECEITA, type Plano } from '@/core';
 import { Papel } from '@/components/papel';
+import { SituacaoPrecos } from '@/components/situacao-precos';
 import { BotaoCabecalho, Tela } from '@/components/tela';
 import { Botao, Cartao, Nota } from '@/components/ui';
 import { useApp } from '@/estado/app';
@@ -10,23 +11,24 @@ import { NOME_REF, PADRAO, nomeMercado } from '@/lib/textos';
 import { FONTES, useCores } from '@/theme';
 
 export default function Inicio() {
-  const { plano, reais, notas } = useApp();
+  const { plano, fontes, notas } = useApp();
   const c = useCores();
   const [exemplo, setExemplo] = useState<Plano | null>(null);
 
-  // O exemplo só aparece para quem ainda não tem plano (a conta leva um instante).
+  // O exemplo só aparece para quem ainda não tem plano; é refeito quando chegam os preços do dia.
   useEffect(() => {
     if (plano) return;
+    let vivo = true;
     const t = setTimeout(() => {
-      try {
-        const r = planejar(PADRAO, 1, reais);
-        if (r.ok) setExemplo(r);
-      } catch {
-        setExemplo(null);
-      }
+      planejarSemTravar(PADRAO, 1, fontes)
+        .then(r => { if (vivo && r.ok) setExemplo(r); })
+        .catch(() => { if (vivo) setExemplo(null); });
     }, 350);
-    return () => clearTimeout(t);
-  }, [plano, reais]);
+    return () => {
+      vivo = false;
+      clearTimeout(t);
+    };
+  }, [plano, fontes]);
 
   return (
     <Tela>
@@ -54,8 +56,9 @@ export default function Inicio() {
           {notas.length ? `Preços reais (${notas.length} ${notas.length === 1 ? 'nota' : 'notas'})` : 'Ler nota fiscal'}
         </Botao>
       </View>
+      <SituacaoPrecos />
       <Nota>
-        Mercados reais da Grande Florianópolis. Os preços são estimados até você ler notas fiscais: aí o app passa a usar o preço real de cada mercado.
+        Mercados reais da Grande Florianópolis. Angeloni, Giassi, Koch e Hippo têm preço do site, lido duas vezes por dia; Komprão, Fort, Bistek e Imperatriz não vendem online e são estimados a partir dos outros. Uma nota fiscal sua vale mais que tudo.
       </Nota>
 
       <Cartao style={{ marginTop: 22, padding: 18, gap: 8 }}>
@@ -63,7 +66,7 @@ export default function Inicio() {
         {[
           'Conta embalagens inteiras (ninguém compra ⅓ de bandeja de frango), reaproveita sobras entre receitas e nunca passa do orçamento.',
           'O passo a passo muda conforme os aparelhos que você tem: fogão, forno, air fryer, micro-ondas, panela de pressão…',
-          'Os preços reais entram pelo QR Code da nota fiscal (NFC-e) das suas compras.',
+          'Preços de verdade: um robô lê os sites dos mercados de manhã e no fim da tarde, e você ainda pode ler o QR Code da nota fiscal (NFC-e) das suas compras.',
         ].map(t => (
           <View key={t} style={{ flexDirection: 'row', gap: 8 }}>
             <Text style={{ fontFamily: FONTES.textoNegrito, color: c.folha, fontSize: 14 }}>•</Text>

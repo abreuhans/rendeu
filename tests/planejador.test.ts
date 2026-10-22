@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   DESPENSA, GRUPOS, ITEM, ITENS, MERCADOS, METODOS, RECEITAS, RESTRICOES, APARELHOS, COZINHAS,
-  candidatos, dinheiro, melhorCombinacao, opcoesItem, passosDe, planejar, quantidade, rng, trocar,
+  candidatos, dinheiro, melhorCombinacao, opcoesItem, passosDe, planejar, planejarSemTravar, quantidade, rng, trocar,
   type Plano, type Preferencias,
 } from '../src/core';
 import { PADRAO } from './fixtures';
@@ -133,6 +133,13 @@ describe('planejador', () => {
     const p = planejar({ ...PADRAO, orcamento: 15 }, 1);
     expect(p.ok).toBe(false);
     if (!p.ok && p.motivo === 'orcamento') expect(p.minimo).toBeGreaterThan(15);
+  });
+
+  it('a versão em fatias (para não travar a tela) dá o mesmo plano', async () => {
+    const a = planejar(PADRAO, 4);
+    const b = await planejarSemTravar(PADRAO, 4, undefined, 1);
+    expect(a.ok && b.ok).toBe(true);
+    if (a.ok && b.ok) expect(b.keys).toEqual(a.keys);
   });
 
   it('troca uma receita mantendo o orçamento', () => {

@@ -1,6 +1,6 @@
 # Rendeu
 
-Aplicativo que monta o cardápio da semana **dentro do valor que você tem**, com receitas que usam os aparelhos da sua cozinha e a lista de compras com preços dos mercados da Grande Florianópolis.
+Aplicativo que monta o cardápio da semana **dentro do valor que você tem**. As receitas usam os aparelhos da sua cozinha, e a lista de compras sai com os preços de hoje dos mercados da Grande Florianópolis: um robô lê os sites dos mercados duas vezes por dia.
 
 Você informa:
 
@@ -13,7 +13,7 @@ Você informa:
 
 O app entrega:
 
-- o cardápio com o custo de cada porção;
+- o cardápio com o custo de cada porção, escolhido entre 203 receitas;
 - as receitas com passo a passo para os aparelhos que você tem;
 - a lista de compras em embalagens inteiras, agrupada por mercado e seção;
 - a comparação entre os mercados.
@@ -49,6 +49,7 @@ Não precisa de Mac nem de Xcode para testar. Para publicar nas lojas, o build �
 | `npm run export:web` | Gera a versão web em `dist/` |
 | `node tests/e2e-app.cjs dist` | Teste de ponta a ponta da versão web (precisa do Playwright instalado) |
 | `npm run prototipo -- saida.html` | Gera o protótipo web de um arquivo só (em `web/prototipo`) |
+| `npm run robo` | Roda o robô de preços no seu computador e grava `saida/precos.json` (aceita `-- --itens=arroz,tomate --lojas=giassi`) |
 
 ## Estrutura
 
@@ -60,14 +61,18 @@ src/
   estado/         estado do app e armazenamento no aparelho
   lib/            textos e contas derivadas do plano
   core/           núcleo em TypeScript puro, sem React Native
-    dados/        mercados, ~80 itens com preço de referência, métodos de preparo e 84 receitas
-    motor/        planejador, preços por embalagem, formatos (R$, quantidades), passo a passo
+    dados/        mercados, 108 itens com preço de referência, métodos de preparo e 203 receitas
+    motor/        planejador, preços (site, nota, estimativa), formatos (R$, quantidades), passo a passo
     nfce/         chave e link da NFC-e, leitura da página da nota, ligação com o catálogo
-tests/            testes do núcleo (Vitest) e de ponta a ponta (Playwright)
+robo/             robô de preços: lê as buscas dos sites dos mercados e grava precos.json
+  amostras/       respostas reais dos sites, usadas nos testes
+.github/workflows/precos.yml   agenda do robô no GitHub Actions (2× por dia)
+docs/             como pedir os dados das notas à Sefaz/SC
+tests/            testes do núcleo e do robô (Vitest) e de ponta a ponta (Playwright)
 web/prototipo/    protótipo web de um arquivo só, feito com o mesmo núcleo
 ```
 
-O núcleo (`src/core`) roda igual no app, no protótipo web e nos testes.
+O núcleo (`src/core`) roda igual no app, no protótipo web, no robô e nos testes.
 
 ## Como o plano é montado
 
@@ -78,28 +83,71 @@ O núcleo (`src/core`) roda igual no app, no protótipo web e nos testes.
    - melhoria local.
 3. **Custo real da compra:** a conta usa embalagens inteiras, na combinação de tamanhos mais barata, e reaproveita o que sobra de uma receita na outra.
 4. **Desempate:** a pontuação equilibra preço, variedade, desperdício de perecíveis, gostos e dieta. Também favorece a sobra do jantar como marmita do dia seguinte.
+   - O gasto pesa menos quando o orçamento é folgado: em vez de sobrar dinheiro à toa, entram pratos melhores e mais variados.
+   - O que sobra e dura (carne no congelador, pacote de arroz aberto) conta como guardado, não como perdido.
+   - Pratos que dividem opiniões (fígado, quiabo) aparecem menos, a não ser que a pessoa diga que adora.
+   - Cada vez que você gera outro plano, uma semente sorteia um "sabor da semana", e o cardápio explora outras combinações boas.
 5. **Resultado:** o plano escolhido nunca passa do orçamento. Se não couber, o app mostra o valor mínimo e oferece ajustes.
+6. **Sem travar:** no app, a conta roda em fatias de ~12 ms (`planejarSemTravar`), então a tela continua respondendo mesmo em celulares mais lentos.
 
-## Preços: estimados e reais
+## Preços: sites, notas fiscais e estimativas
 
-- **Sem nota fiscal:** os preços são **estimados**. O cálculo usa o preço de referência do item, o fator do mercado (atacarejo, supermercado, premium) e uma variação por produto.
-- **Com nota fiscal (NFC-e):** depois de uma compra, a pessoa lê o QR Code do cupom.
+O app usa, para cada produto em cada mercado, a melhor fonte disponível, nesta ordem:
+
+1. **Nota fiscal lida por você nos últimos 30 dias:** é o preço que você pagou naquela loja.
+2. **Site do mercado**, lido pelo robô duas vezes por dia.
+3. **Nota fiscal mais antiga**.
+4. **Estimativa:**
+   - o preço de referência do item, corrigido pelo que os sites estão cobrando (se o tomate subiu 40% nos sites, a estimativa sobe junto);
+   - multiplicado pelo nível de preço do mercado (atacarejo, supermercado, premium).
+
+### O robô de preços (grátis, sem servidor)
+
+| Mercado | De onde vem o preço |
+| --- | --- |
+| Angeloni, Giassi | Busca pública do site (VTEX Intelligent Search), ordenada pelos mais vendidos |
+| Koch (loja 1411, Florianópolis), Hippo (loja 1384) | Busca pública do site (plataforma OSuper) |
+| Bistek | Estimativa: o `robots.txt` do site proíbe robôs em `/api/` |
+| Komprão, Fort, Imperatriz | Estimativa: não têm loja online com preço |
+
+- **Quando roda:** o GitHub Actions (`.github/workflows/precos.yml`) roda o robô às 06:17 e às 17:47 (horário de Brasília). Também roda quando o robô ou o catálogo mudam, e manualmente pelo botão **Run workflow** na aba **Actions**.
+- **O que o robô faz:**
+  - procura cada um dos 108 itens com termos e filtros próprios (`robo/itens.ts`);
+  - só aceita o produto que as regras de leitura de nota também reconhecem;
+  - descarta preços fora da realidade;
+  - escolhe as embalagens mais baratas parecidas com as do catálogo (por exemplo, arroz de 1 kg e de 5 kg).
+- **Onde publica:** no branch [`precos`](https://github.com/abreuhans/rendeu/tree/precos), arquivo `precos.json`. O histórico de commits desse branch é o histórico de preços.
+  - Se uma loja falhar, ficam valendo os preços anteriores dela, e o campo `status` do arquivo mostra o erro.
+- **No app:**
+  - ao abrir, usa os preços guardados no aparelho na hora (funciona sem internet);
+  - em segundo plano, baixa a versão nova de `https://raw.githubusercontent.com/abreuhans/rendeu/precos/precos.json`;
+  - refaz a conta do plano quando chegam preços novos;
+  - ignora preço de loja com mais de 7 dias.
+  - A lista de compras mostra o nome do produto do site (marca e embalagem) e marca o que é estimado.
+- **Boas maneiras:**
+  - o robô usa só as buscas que os próprios sites usam;
+  - confere o `robots.txt` antes de buscar;
+  - se identifica (`RendeuBot`) e faz cerca de uma busca por segundo em cada loja.
+  - Antes de publicar o app nas lojas, vale pedir autorização ou propor parceria aos mercados.
+- **Limites:**
+  - o preço do site pode ser diferente do da loja física;
+  - preço de clube (com CPF) não entra;
+  - "tempo real" aqui quer dizer "atualizado duas vezes por dia".
+
+### Notas fiscais (NFC-e)
+
+- Depois de uma compra, a pessoa lê o QR Code do cupom.
   - O app abre a consulta pública da nota no site da Sefaz/SC dentro de uma WebView. Se o site pedir a verificação do Cloudflare, a pessoa confirma.
   - O app lê a tabela de produtos e liga cada linha ao catálogo, por exemplo "ARROZ TIO JOAO T1 5KG" → arroz, R$/kg.
-  - Esses preços passam a valer para aquele mercado nos próximos planos.
 - **No navegador do computador:** o site da Sefaz não pode ser lido por dentro. A pessoa abre a nota em outra aba, copia o texto da página e cola no app.
 - **Privacidade:** da nota, o app guarda só produto, preço, mercado e data. Não guarda CPF. Tudo fica no aparelho.
 
-Preços em tempo real de todos os mercados ainda não existem por API pública:
+### Dados da Sefaz/SC
 
-- O [Menor Preço Brasil](https://www.sef.sc.gov.br/noticias/consumidor-catarinense-ja-pode-comparar-precos-em-tempo-real-por-aplicativo) já usa as notas fiscais de SC, mas não oferece API.
-
-Caminhos para ir além das notas lidas por cada pessoa:
-
-- juntar as notas de todos os usuários num servidor (Supabase, por exemplo), para que uma nota ajude todo mundo;
-- pedir os dados à Sefaz/SC (Lei de Acesso à Informação) ou propor uma parceria;
-- usar um serviço pago de consulta de NFC-e, como a [Infosimples](https://infosimples.com/consultas/sefaz-sc-nfce/);
-- ler os sites de compra online dos mercados, respeitando os termos de uso de cada um.
+- Santa Catarina entrou no app [Menor Preço Brasil](https://noticias.sc.gov.br/consumidor-catarinense-ja-pode-comparar-precos-em-tempo-real-por-aplicativo/) em maio de 2026, com a base das notas fiscais do estado. Ele não tem API pública.
+- O passo a passo para pedir esses dados está em [`docs/pedido-dados-sef-sc.md`](docs/pedido-dados-sef-sc.md):
+  - pedido pela Lei de Acesso à Informação no e-SIC de SC, com um modelo de texto pronto;
+  - acordo de cooperação com a SEF/SC.
 
 ## Publicar nas lojas (quando estiver pronto)
 
@@ -117,10 +165,10 @@ Caminhos para ir além das notas lidas por cada pessoa:
 
 ## Próximos passos sugeridos
 
-- Testar a leitura de notas reais de vários mercados de Florianópolis e ajustar o casamento de produtos.
-- Servidor para compartilhar os preços das notas entre usuários (preços mais frescos para todos).
+- Acompanhar as primeiras coletas do robô no branch `precos` e ajustar os termos de busca dos itens que vierem sem preço.
+- Servidor gratuito (Supabase) para juntar as notas fiscais de todos os usuários. Isso cobre o Komprão, o Fort, o Bistek e o Imperatriz, que não têm site com preço.
+- Pedido de dados à Sefaz/SC (veja `docs/`).
 - CEP e localização para sugerir as lojas mais perto.
-- Mais receitas e itens no catálogo.
 - Receitas criadas com IA. A chamada passa por um servidor (a chave da API nunca fica no app), e o app confere ingredientes, preço e orçamento antes de aceitar a receita.
 
 ## Licença

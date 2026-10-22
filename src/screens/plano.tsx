@@ -3,17 +3,18 @@ import * as Clipboard from 'expo-clipboard';
 import { router } from 'expo-router';
 import { Pressable, ScrollView, Share, Text, View } from 'react-native';
 import {
-  ITEM, ITENS, ORDEM_REFEICOES, dinheiro, numero, quantidade, type Plano,
+  ITEM, ITENS, ORDEM_REFEICOES, dinheiro, lojasValidas, numero, quantidade, type Plano,
 } from '@/core';
 import { Icone } from '@/components/icones';
 import { Papel } from '@/components/papel';
+import { SituacaoPrecos } from '@/components/situacao-precos';
 import { Sobrelinha } from '@/components/tela';
 import { Botao, Cartao, EtiquetaPreco, Nota, Selo } from '@/components/ui';
 import { useApp } from '@/estado/app';
 import {
-  custoPorcao, descricaoCompra, infoReceita, linhasCompra, mercadosUsados, resumoSobras, selos, textoLista,
+  custoPorcao, descricaoCompra, infoReceita, linhasCompra, mercadosUsados, origemPreco, resumoSobras, selos, textoLista,
 } from '@/lib/plano';
-import { NOME_REF, SECOES, nomeMercado, plural } from '@/lib/textos';
+import { NOME_REF, SECOES, nomeMercado, plural, quando } from '@/lib/textos';
 import { FONTES, RAIO, useCores } from '@/theme';
 
 export type Aba = 'cardapio' | 'compras' | 'mercados' | 'bastidores';
@@ -56,7 +57,7 @@ export function Resumo({ plano }: { plano: Plano }) {
       {passou ? (
         <View style={{ marginTop: 10, gap: 10 }}>
           <Text style={{ fontFamily: FONTES.texto, fontSize: 14, lineHeight: 20, color: c.tinta2 }}>
-            Os preços das notas lidas mudaram a conta. Gere de novo para voltar a caber no orçamento.
+            Os preços mudaram desde que o plano foi feito (site do mercado ou nota lida). Gere de novo para voltar a caber no orçamento.
           </Text>
           <Botao pequeno onPress={() => router.push({ pathname: '/gerando', params: { novo: '1' } })}>Gerar de novo</Botao>
         </View>
@@ -129,11 +130,11 @@ export function Cardapio({ plano }: { plano: Plano }) {
 
 function CartaoRefeicao({ plano, i }: { plano: Plano; i: number }) {
   const c = useCores();
-  const { reais } = useApp();
+  const { fontes } = useApp();
   const v = plano.vmap[plano.keys[i]];
   const info = infoReceita(v);
   const marcas = selos(plano, i);
-  const preco = dinheiro(custoPorcao(plano, v, reais));
+  const preco = dinheiro(custoPorcao(plano, v, fontes));
   return (
     <Pressable
       onPress={() => router.push(`/receita/${i}`)}
@@ -172,7 +173,12 @@ export function Compras({ plano }: { plano: Plano }) {
   const linhas = linhasCompra(plano);
   const porMercado = new Map<string, typeof linhas>();
   for (const x of linhas) porMercado.set(x.compra!.mercado, [...(porMercado.get(x.compra!.mercado) ?? []), x]);
-  const reais = linhas.filter(x => x.compra!.real).length;
+  const origens = { nota: 0, site: 0, estimado: 0 };
+  for (const x of linhas) origens[origemPreco(x)]++;
+  const misturado = origens.estimado > 0 && origens.estimado < linhas.length;
+  const resumoOrigem = origens.estimado === linhas.length
+    ? 'preços estimados'
+    : [origens.site && `${origens.site} do site`, origens.nota && `${origens.nota} de nota`, origens.estimado && `${origens.estimado} estimados`].filter(Boolean).join(' · ');
   const { emCasa, pereciveis, despensa, valorDespensa } = resumoSobras(plano);
   const mono = { fontFamily: FONTES.mono, color: c.papelTinta };
 
@@ -199,7 +205,7 @@ export function Compras({ plano }: { plano: Plano }) {
           <View style={{ alignItems: 'center', gap: 2, paddingBottom: 12, borderBottomWidth: 1, borderStyle: 'dashed', borderColor: c.papelLinha }}>
             <Text style={{ ...mono, fontFamily: FONTES.monoForte, fontSize: 15, letterSpacing: 2.4, textTransform: 'uppercase' }}>Lista de compras</Text>
             <Text style={{ ...mono, fontSize: 12, opacity: 0.7 }}>
-              {linhas.length} itens · {reais ? `${reais} com preço de nota` : 'preços estimados'}
+              {linhas.length} itens · {resumoOrigem}
             </Text>
           </View>
           {[...porMercado].map(([m, xs]) => {
@@ -241,6 +247,7 @@ export function Compras({ plano }: { plano: Plano }) {
                             {it.nome}
                             {x.compra!.oferta ? <Text style={{ fontFamily: FONTES.textoNegrito, fontSize: 10, color: c.etiquetaTinta, backgroundColor: c.etiqueta }}> OFERTA </Text> : null}
                             {x.compra!.real ? <Text style={{ fontFamily: FONTES.textoNegrito, fontSize: 10, color: c.folhaTinta, backgroundColor: c.folha }}> NOTA </Text> : null}
+                            {misturado && origemPreco(x) === 'estimado' ? <Text style={{ fontFamily: FONTES.textoForte, fontSize: 10, color: c.papelTinta, opacity: 0.6 }}> ≈ estimado</Text> : null}
                           </Text>
                           <Text style={{ ...mono, fontSize: 11.5, opacity: 0.68 }}>{descricaoCompra(x)}</Text>
                         </View>
@@ -313,7 +320,8 @@ function LinhaTotal({ rotulo, valor }: { rotulo: string; valor: string }) {
 
 export function Mercados({ plano }: { plano: Plano }) {
   const c = useCores();
-  const { precos } = useApp();
+  const { precos, site } = useApp();
+  const comSite = lojasValidas(site);
   const p = plano.prefs;
   const linhas = plano.porMercado.slice().sort((a, b) => a.total - b.total);
   const escala = Math.max(p.orcamento, ...linhas.map(x => x.total)) * 1.04;
@@ -333,7 +341,10 @@ export function Mercados({ plano }: { plano: Plano }) {
               <View style={{ width: 112 }}>
                 <Text style={{ fontFamily: FONTES.textoNegrito, fontSize: 14, color: c.tinta }}>{nomeMercado(x.mercado)}</Text>
                 {i === 0 ? <Text style={{ fontFamily: FONTES.textoForte, fontSize: 10.5, letterSpacing: 0.6, textTransform: 'uppercase', color: c.folha }}>mais barato</Text> : null}
-                {n ? <Text style={{ fontFamily: FONTES.texto, fontSize: 11, color: c.tinta2 }}>{n} {plural(n, 'preço', 'preços')} de nota</Text> : null}
+                <Text style={{ fontFamily: FONTES.texto, fontSize: 11, color: c.tinta2 }}>
+                  {comSite[x.mercado] ? `site · ${quando(comSite[x.mercado].data)}` : 'estimado'}
+                  {n ? ` · ${n} ${plural(n, 'preço', 'preços')} de nota` : ''}
+                </Text>
               </View>
               <View style={{ flex: 1, height: 14, borderRadius: 999, backgroundColor: c.superficie2 }}>
                 <View style={{ width: `${(x.total / escala) * 100}%`, height: '100%', borderRadius: 999, backgroundColor: passou ? c.tomate : c.folha }} />
@@ -351,7 +362,8 @@ export function Mercados({ plano }: { plano: Plano }) {
       {p.mercados.length > 1 ? (
         <Text style={{ fontFamily: FONTES.texto, fontSize: 15, color: c.tinta2, marginTop: 12 }}>Dividindo entre os mercados: {dinheiro(plano.dividido)}</Text>
       ) : null}
-      <Nota>Sem nota fiscal, os preços são estimados. Cada nota lida atualiza os preços daquele mercado.</Nota>
+      <SituacaoPrecos />
+      <Nota>Quem não tem loja online (Komprão, Fort, Bistek, Imperatriz) tem preço estimado a partir dos sites dos outros. Cada nota fiscal lida passa a valer para o mercado dela.</Nota>
       <View style={{ marginTop: 14, alignItems: 'flex-start' }}>
         <Botao pequeno variante="contorno" icone="nota" onPress={() => router.push('/notas')}>Ler nota fiscal</Botao>
       </View>
@@ -364,11 +376,11 @@ export function Bastidores({ plano }: { plano: Plano }) {
   const p = plano.prefs;
   const st = plano.meta.stats;
   const itens: [string, string][] = [
-    ['Preços', `${ITENS.length} produtos com preço por embalagem em ${p.mercados.length} ${plural(p.mercados.length, 'mercado', 'mercados')} da Grande Florianópolis.`],
+    ['Preços', `${ITENS.length} produtos com preço por embalagem em ${p.mercados.length} ${plural(p.mercados.length, 'mercado', 'mercados')}. Um robô lê os sites do Angeloni, Giassi, Koch e Hippo de manhã e no fim da tarde; os outros mercados são estimados a partir desses preços.`],
     ['Filtro de receitas', `${st.total} receitas no catálogo → ${st.combinam} combinam com sua dieta, restrições e gostos → ${st.possiveis} dá para fazer com seus aparelhos.`],
     ['Otimização', `${numero(plano.meta.rodadas)} cardápios simulados. O escolhido custa ${dinheiro(plano.custo.total)} (limite ${dinheiro(p.orcamento)}). Conta embalagens inteiras e reaproveita o que sobra de uma receita na outra.`],
     ['Passo a passo', 'Cada etapa de cozimento tem versões para fogão, forno, micro-ondas, air fryer, panela de pressão e outros. Você vê a do aparelho que tem.'],
-    ['Preços reais', 'Você lê o QR Code da nota fiscal (NFC-e). O app abre a nota no site da Sefaz, lê os itens e passa a usar aqueles preços no mercado da nota.'],
+    ['Notas fiscais', 'Você lê o QR Code da nota fiscal (NFC-e). O app abre a nota no site da Sefaz, lê os itens e passa a usar aqueles preços no mercado da nota (valem mais que o site por 30 dias).'],
     ['Seus dados', 'Escolhas, plano e preços ficam só no seu celular. Da nota, o app guarda apenas produtos e preços (nunca o CPF).'],
   ];
   return (

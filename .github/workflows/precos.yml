@@ -1,0 +1,88 @@
+# Robô de preços: lê os sites dos mercados e publica precos.json na branch "precos",
+# de onde o app baixa (https://raw.githubusercontent.com/abreuhans/rendeu/precos/precos.json).
+name: Preços dos mercados
+
+on:
+  schedule:
+    # 06:17 e 17:47 em Florianópolis (UTC−3). Minutos quebrados fogem do pico de agendamentos do GitHub.
+    - cron: '17 9 * * *'
+    - cron: '47 20 * * *'
+  # Botão "Run workflow" na aba Actions.
+  workflow_dispatch:
+  # Mudou o robô ou o catálogo: roda na hora para conferir.
+  push:
+    branches: [main]
+    paths:
+      - 'robo/**'
+      - 'src/core/**'
+      - '.github/workflows/precos.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: precos
+  cancel-in-progress: false
+
+jobs:
+  coletar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Busca os preços anteriores (ficam valendo se uma loja falhar)
+        run: |
+          if git fetch --depth=1 origin precos 2>/dev/null; then
+            git show FETCH_HEAD:precos.json > anterior.json || echo '{}' > anterior.json
+          else
+            echo '{}' > anterior.json
+          fi
+
+      - name: Roda o robô
+        run: |
+          set -o pipefail
+          mkdir -p saida
+          npx --yes esbuild@0.28.2 robo/coletar.ts --bundle --platform=node --format=esm --outfile=.robo/coletar.mjs --log-level=warning
+          node .robo/coletar.mjs saida/precos.json anterior.json | tee saida/log.txt
+          {
+            echo '### Preços coletados'
+            echo '```'
+            cat saida/log.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publica na branch "precos"
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin precos > /dev/null; then
+            git fetch --depth=1 origin precos
+            git worktree add publicar FETCH_HEAD
+            cd publicar
+            git checkout -q -B precos
+          else
+            git worktree add --detach publicar
+            cd publicar
+            git checkout -q --orphan precos
+            git rm -rfq .
+          fi
+          cp ../saida/precos.json precos.json
+          cat > README.md <<'FIM'
+          # Preços dos mercados (gerado automaticamente)
+
+          Este branch guarda só o `precos.json` que o app Rendeu baixa. Quem atualiza é o robô
+          em `robo/` (branch `main`), pelo workflow `.github/workflows/precos.yml`, duas vezes por dia.
+          O histórico de commits deste branch é o histórico de preços. Não edite à mão.
+          FIM
+          git add precos.json README.md
+          if git diff --cached --quiet; then
+            echo 'Nada mudou.'
+            exit 0
+          fi
+          git commit -qm "Preços de $(TZ=America/Sao_Paulo date +'%d/%m/%Y %H:%M')"
+          git push -q origin precos

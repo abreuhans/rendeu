@@ -45,6 +45,7 @@
     "typecheck": "tsc --noEmit",
     "export:web": "expo export --platform web",
     "prototipo": "node scripts/prototipo.mjs",
+    "robo": "esbuild robo/coletar.ts --bundle --platform=node --format=esm --outfile=.robo/coletar.mjs --log-level=warning && node .robo/coletar.mjs saida/precos.json saida/precos.json",
     "lint": "expo lint"
   },
   "private": true

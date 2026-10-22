@@ -27,17 +27,18 @@ export default function Gerando() {
     return () => clearInterval(iv);
   }, [linhas.length]);
 
-  // Gera uma vez ao abrir a tela; a conta trava a tela por um instante, então espera o primeiro desenho.
+  // Gera uma vez ao abrir a tela. A conta roda aos poucos (a tela continua respondendo).
   useEffect(() => {
     let viva = true;
     let depois: ReturnType<typeof setTimeout> | undefined;
     const inicio = Date.now();
-    const antes = setTimeout(() => {
-      const r = exemplo
+    const antes = setTimeout(async () => {
+      const r = await (exemplo
         ? gerar({ prefs: JSON.parse(JSON.stringify(PADRAO)), semente: 1 })
         : novo && plano
           ? gerar({ prefs: plano.prefs, novaSemente: true })
-          : gerar();
+          : gerar());
+      if (!viva) return;
       depois = setTimeout(() => {
         if (!viva) return;
         if (!r.ok) router.replace('/problema');

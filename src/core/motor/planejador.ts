@@ -299,7 +299,11 @@ export function avaliar(keys: string[], slots: Slot[], getV: (k: string) => Vari
   return { score, total: custo.total };
 }
 
-function buscar(prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>>, slots: Slot[], tab: Tabela, semente: number, E: Estilo, rodadas: number) {
+type Melhor = { keys: string[]; score: number; total: number };
+/** Os laços longos são geradores: param (yield) de tempos em tempos para o app não travar a tela. */
+type Passos<T> = Generator<void, T, void>;
+
+function* buscar(prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>>, slots: Slot[], tab: Tabela, semente: number, E: Estilo, rodadas: number): Passos<{ melhor: Melhor | null; maisBarato: Melhor | null; getV: (k: string) => Variante }> {
   const H = prefs.pessoas, B = prefs.orcamento, emCasa = new Set(prefs.despensa);
   const aleatorio = rng(semente);
   const byKey: Record<string, Variante> = {};
@@ -348,6 +352,7 @@ function buscar(prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>
   const estoque = new Float64Array(pacote.length);
   const hist = new Historico(E);
   for (let rod = 0; rod < rodadas; rod++) {
+    if (rod % 6 === 5) yield;
     estoque.fill(0);
     hist.limpar();
     const keys: string[] = [];
@@ -397,7 +402,7 @@ function buscar(prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>
 }
 
 /** Busca local: troca uma refeição por vez enquanto a nota do cardápio sobe (contas incrementais). */
-function melhorar(plano: { keys: string[]; score: number; total: number }, prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>>, slots: Slot[], getV: (k: string) => Variante, tab: Tabela, E: Estilo) {
+function* melhorar(plano: Melhor, prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>>, slots: Slot[], getV: (k: string) => Variante, tab: Tabela, E: Estilo): Passos<Melhor> {
   const H = prefs.pessoas, B = prefs.orcamento, emCasa = new Set(prefs.despensa);
   const keys = plano.keys.slice();
   const vs = keys.map(getV);
@@ -427,6 +432,7 @@ function melhorar(plano: { keys: string[]; score: number; total: number }, prefs
   for (let passe = 0; passe < 2; passe++) {
     let mudou = false;
     for (let i = 0; i < slots.length; i++) {
+      if (i % 3 === 2) yield;
       for (const v of topo[slots[i].r]!) {
         const a = vs[i];
         if (v.key === a.key) continue;
@@ -463,6 +469,28 @@ function melhorar(plano: { keys: string[]; score: number; total: number }, prefs
 
 /** Monta o plano. `fontes` traz os preços de notas fiscais e dos sites (sem elas, só estimativas). */
 export function planejar(prefs: Preferencias, semente: number, fontes?: FontesPreco): Plano | Problema {
+  const g = passosDoPlano(prefs, semente, fontes);
+  let r = g.next();
+  while (!r.done) r = g.next();
+  return r.value;
+}
+
+/** O mesmo que `planejar`, mas devolve o controle à tela a cada ~`fatiaMs` (o celular não congela). */
+export async function planejarSemTravar(prefs: Preferencias, semente: number, fontes?: FontesPreco, fatiaMs = 12): Promise<Plano | Problema> {
+  const g = passosDoPlano(prefs, semente, fontes);
+  let inicio = Date.now();
+  let r = g.next();
+  while (!r.done) {
+    if (Date.now() - inicio >= fatiaMs) {
+      await new Promise(ok => setTimeout(ok, 0));
+      inicio = Date.now();
+    }
+    r = g.next();
+  }
+  return r.value;
+}
+
+function* passosDoPlano(prefs: Preferencias, semente: number, fontes?: FontesPreco): Passos<Plano | Problema> {
   const slots = slotsDe(prefs);
   const { cands: base, stats } = candidatos(prefs);
   for (const r of ORDEM_REFEICOES) if (base[r] && !base[r]!.length) return { ok: false, motivo: 'receitas', refeicao: r, stats };
@@ -477,12 +505,14 @@ export function planejar(prefs: Preferencias, semente: number, fontes?: FontesPr
   let melhor: { keys: string[]; score: number; mercados: string[] } | null = null;
   let maisBarato: { total: number } | null = null;
   let rodadas = 0;
-  contextos.forEach((mercados, ci) => {
+  for (let ci = 0; ci < contextos.length; ci++) {
+    const mercados = contextos[ci];
     const tab = tabela(mercados, fontes);
-    const r1 = buscar(prefs, cands, slots, tab, semente * 31 + ci, E, 110);
-    const r2 = buscar(prefs, cands, slots, tab, semente * 31 + ci + 7, barato, 30);
+    yield;
+    const r1 = yield* buscar(prefs, cands, slots, tab, semente * 31 + ci, E, 110);
+    const r2 = yield* buscar(prefs, cands, slots, tab, semente * 31 + ci + 7, barato, 30);
     rodadas += 140;
-    let local: { keys: string[]; score: number; total: number } | null = null;
+    let local: Melhor | null = null;
     for (const r of [r1, r2]) {
       if (r.melhor) {
         const av = avaliar(r.melhor.keys, slots, r1.getV, prefs, tab, E);
@@ -491,10 +521,10 @@ export function planejar(prefs: Preferencias, semente: number, fontes?: FontesPr
       if (r.maisBarato && (!maisBarato || r.maisBarato.total < maisBarato.total)) maisBarato = { total: r.maisBarato.total };
     }
     if (local) {
-      const m = melhorar(local, prefs, cands, slots, r1.getV, tab, E);
+      const m = yield* melhorar(local, prefs, cands, slots, r1.getV, tab, E);
       if (!melhor || m.score > melhor.score) melhor = { keys: m.keys, score: m.score, mercados };
     }
-  });
+  }
   if (!melhor) return { ok: false, motivo: 'orcamento', minimo: (maisBarato as { total: number } | null)?.total ?? 0, stats };
   const m = melhor as { keys: string[]; mercados: string[] };
   return finalizar(prefs, m.keys, m.mercados, {}, { semente, rodadas, stats }, fontes);

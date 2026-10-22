@@ -110,10 +110,8 @@ async function main() {
     console.log(`${l.nome}: ${n} itens com preço · ${r.buscas} buscas · ${r.erros} erros${ok ? '' : ' (mantidos os preços anteriores)'}`);
     for (const e of r.exemplos) console.log('   ' + e);
   }
-  if (!Object.keys(publicadas).length) {
-    console.error('Nenhuma loja respondeu: nada a publicar.');
-    process.exit(1);
-  }
+  // Mesmo sem nenhuma loja, publica o status: é por ele que dá para ver o que falhou (o app ignora lojas vazias).
+  if (!Object.keys(publicadas).length) console.warn('Nenhuma loja respondeu nesta coleta.');
   const arquivo: PrecosSite & { status: Record<string, StatusLoja> } = { versao: 1, geradoEm: agora, lojas: publicadas, status };
   await mkdir(dirname(saida), { recursive: true });
   await writeFile(saida, JSON.stringify(arquivo));

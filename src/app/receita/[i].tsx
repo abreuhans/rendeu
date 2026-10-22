@@ -12,7 +12,7 @@ import { FONTES, useCores } from '@/theme';
 
 export default function Receita() {
   const { i: param } = useLocalSearchParams<{ i: string }>();
-  const { plano, reais, metodo, escolherMetodo, trocarReceita } = useApp();
+  const { plano, fontes, metodo, escolherMetodo, trocarReceita } = useApp();
   const c = useCores();
   const [status, setStatus] = useState<{ texto: string; ok: boolean } | null>(null);
   const i = Number(param);
@@ -36,7 +36,7 @@ export default function Receita() {
   const slot = plano.slots[i];
   const info = infoReceita(v);
   const H = plano.prefs.pessoas;
-  const tab = tabelaDo(plano, reais);
+  const tab = tabelaDo(plano, fontes);
   const casa = new Set(plano.prefs.despensa);
   const passos = passosDe(v, plano.prefs.aparelhos, metodo);
   const nut: [string, number, string][] = [['kcal', v.nut.kcal, ''], ['prot.', v.nut.p, ' g'], ['carb.', v.nut.c, ' g'], ['gord.', v.nut.g, ' g']];
@@ -59,7 +59,7 @@ export default function Receita() {
         {info.nome}
       </Text>
       <Text style={{ fontFamily: FONTES.texto, fontSize: 14, color: c.tinta2, marginTop: 8 }}>
-        {info.tempo} min · {H} {plural(H, 'porção', 'porções')}{info.cozinha ? ' · ' + info.cozinha : ''} · {dinheiro(custoPorcao(plano, v, reais))} por porção
+        {info.tempo} min · {H} {plural(H, 'porção', 'porções')}{info.cozinha ? ' · ' + info.cozinha : ''} · {dinheiro(custoPorcao(plano, v, fontes))} por porção
       </Text>
       {selos(plano, i).length ? (
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>

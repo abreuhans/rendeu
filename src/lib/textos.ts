@@ -62,6 +62,24 @@ export const nomeMercado = (id: string) => MERCADOS.find(m => m.id === id)?.nome
 
 export const plural = (n: number, um: string, varios: string) => (n === 1 ? um : varios);
 
+/** "A", "A e B", "A, B e C". */
+export function juntar(lista: string[]): string {
+  return lista.length <= 1 ? lista.join('') : `${lista.slice(0, -1).join(', ')} e ${lista[lista.length - 1]}`;
+}
+
+/** "hoje às 06:17", "ontem às 18:17" ou "21/10 às 06:17", na hora do aparelho. */
+export function quando(iso: string, agora = new Date()): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const dois = (n: number) => String(n).padStart(2, '0');
+  const hora = `${dois(d.getHours())}:${dois(d.getMinutes())}`;
+  const dia = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const dif = Math.round((dia(agora) - dia(d)) / 864e5);
+  if (dif === 0) return `hoje às ${hora}`;
+  if (dif === 1) return `ontem às ${hora}`;
+  return `${dois(d.getDate())}/${dois(d.getMonth() + 1)} às ${hora}`;
+}
+
 /** Tira ou põe um valor numa lista (sem mexer na original). */
 export function alternar<T>(lista: T[], v: T): T[] {
   return lista.includes(v) ? lista.filter(x => x !== v) : [...lista, v];

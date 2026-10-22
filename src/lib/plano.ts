@@ -2,17 +2,17 @@
 import {
   COZINHAS, ITEM, PERECIVEIS, RECEITA,
   dinheiro, numero, precoPorMedida, precoUnitarioMinimo, tabela,
-  type ItemCompra, type Plano, type PrecosReais, type Tabela, type Variante,
+  type FontesPreco, type ItemCompra, type Plano, type Tabela, type Variante,
 } from '@/core';
 import { ORDEM_SECOES, nomeMercado, plural } from './textos';
 
 const cacheTabela = new WeakMap<Plano, Tabela>();
 
 /** Tabela de preços dos mercados do plano (cada plano é recalculado quando os preços mudam). */
-export function tabelaDo(plano: Plano, reais?: PrecosReais): Tabela {
+export function tabelaDo(plano: Plano, fontes?: FontesPreco): Tabela {
   let t = cacheTabela.get(plano);
   if (!t) {
-    t = tabela(plano.mercados, reais);
+    t = tabela(plano.mercados, fontes);
     cacheTabela.set(plano, t);
   }
   return t;
@@ -28,8 +28,8 @@ export function infoReceita(v: Variante): { nome: string; tempo: number; cozinha
 }
 
 /** Custo aproximado de uma porção (sem contar o que já tem em casa). */
-export function custoPorcao(plano: Plano, v: Variante, reais?: PrecosReais): number {
-  const tab = tabelaDo(plano, reais);
+export function custoPorcao(plano: Plano, v: Variante, fontes?: FontesPreco): number {
+  const tab = tabelaDo(plano, fontes);
   const casa = new Set(plano.prefs.despensa);
   let c = 0;
   for (const l of v.linhas) if (!casa.has(l.id)) c += l.q * precoUnitarioMinimo(l.id, tab).porUnidade;
@@ -68,6 +68,9 @@ export function descricaoCompra(x: ItemCompra): string {
   const medida = maior ? precoPorMedida(x.id, maior.preco, maior.tamanho) : '';
   return pac + (medida ? ` · ${medida}` : '');
 }
+
+/** De onde veio o preço de uma compra: nota fiscal lida, site do mercado ou estimativa. */
+export const origemPreco = (x: ItemCompra): 'nota' | 'site' | 'estimado' => (x.compra?.real ? 'nota' : x.compra?.site ? 'site' : 'estimado');
 
 /** Itens a comprar, por mercado, seção do mercado e nome. */
 export function linhasCompra(plano: Plano): ItemCompra[] {
