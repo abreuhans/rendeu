@@ -25,7 +25,7 @@ O total da compra nunca passa do orçamento.
 1. Instale o [Node.js LTS](https://nodejs.org) e o [Git](https://git-scm.com/download/win).
 2. No PowerShell, baixe o projeto e instale as dependências:
    ```powershell
-   git clone https://github.com/<seu-usuario>/rendeu.git
+   git clone https://github.com/abreuhans/rendeu.git
    cd rendeu
    npm install
    ```
@@ -145,9 +145,23 @@ O app usa, para cada produto em cada mercado, a melhor fonte disponível, nesta 
 
 ### Coletar pelo seu computador (Windows)
 
-A internet de casa não é bloqueada como os servidores do GitHub. Na pasta do projeto, com o git conectado à sua conta do GitHub (o mesmo login do `git push`):
+A internet de casa não é bloqueada como os servidores do GitHub.
 
-```powershell
+**Primeira vez:** o projeto precisa estar no computador. Os comandos de npm só funcionam dentro da pasta dele, porque é lá que fica o `package.json`. No **Prompt de Comando**:
+
+```bat
+cd %USERPROFILE%
+git clone https://github.com/abreuhans/rendeu.git
+cd rendeu
+npm install
+```
+
+- Isso cria a pasta `C:\Users\<você>\rendeu`.
+- Se o projeto já estiver em outra pasta, entre nela com `cd` e rode `git pull`.
+
+**Para coletar:** dê dois cliques em `coletar-precos.bat`, na pasta do projeto. Ou, no Prompt de Comando, dentro da pasta, rode:
+
+```bat
 npm run robo:publicar
 ```
 
@@ -158,16 +172,28 @@ O comando:
 - grava `saida/precos.json`;
 - publica o arquivo num commit novo do branch `precos`, sem mexer no que você está editando.
 
-O app pega os preços novos na próxima vez que abrir. Loja que falhar continua com os preços anteriores.
-
-Para rodar sozinho todo dia, crie duas tarefas no Agendador de Tarefas. No **Prompt de Comando**, troque o caminho pela pasta do projeto:
+Na primeira vez que publicar, o Git pode abrir o navegador para você entrar na conta do GitHub. Se o git reclamar que não sabe quem você é, configure uma vez:
 
 ```bat
-schtasks /Create /TN "Rendeu precos manha" /SC DAILY /ST 06:30 /TR "cmd /c cd /d C:\caminho\rendeu && npm run robo:publicar"
-schtasks /Create /TN "Rendeu precos tarde" /SC DAILY /ST 17:30 /TR "cmd /c cd /d C:\caminho\rendeu && npm run robo:publicar"
+git config --global user.name "Seu Nome"
+git config --global user.email "seu-email@exemplo.com"
 ```
 
-O computador precisa estar ligado nesses horários. No Agendador de Tarefas, marque "Executar a tarefa o mais cedo possível após uma inicialização agendada ser perdida".
+O app pega os preços novos na próxima vez que abrir. Loja que falhar continua com os preços anteriores.
+
+**Para rodar sozinho todo dia:** crie duas tarefas no Agendador de Tarefas, trocando o caminho se a pasta for outra:
+
+```bat
+schtasks /Create /TN "Rendeu precos manha" /SC DAILY /ST 06:30 /TR "C:\Users\abreu\rendeu\coletar-precos.bat agendado"
+schtasks /Create /TN "Rendeu precos tarde" /SC DAILY /ST 17:30 /TR "C:\Users\abreu\rendeu\coletar-precos.bat agendado"
+```
+
+- O computador precisa estar ligado nesses horários.
+- No Agendador de Tarefas, marque "Executar a tarefa o mais cedo possível após uma inicialização agendada ser perdida".
+- O `coletar-precos.bat`:
+  - atualiza o projeto (`git pull`);
+  - instala as dependências na primeira vez;
+  - só espera você apertar uma tecla quando é aberto com dois cliques.
 
 ### Notas fiscais (NFC-e)
 
