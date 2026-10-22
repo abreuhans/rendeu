@@ -109,6 +109,16 @@ async function coletarLoja(loja: Loja, itens: string[]) {
   return { resultado, buscas, erros, exemplos, parou };
 }
 
+/**
+ * O que publicar de uma loja. Coleta boa substitui tudo. Coleta fraca (bloqueio, site fora do ar)
+ * só atualiza os itens que vieram e mantém o resto, com a data antiga (que nunca exagera o frescor).
+ */
+export function juntarLoja(anterior: LojaSite | undefined, novos: Record<string, OfertaSite[]>, ok: boolean, agora: string): LojaSite | undefined {
+  if (ok) return { data: agora, itens: novos };
+  if (anterior) return { data: anterior.data, itens: { ...anterior.itens, ...novos } };
+  return Object.keys(novos).length ? { data: agora, itens: novos } : undefined;
+}
+
 export interface OpcoesColeta {
   itens?: string[];
   lojas?: string[];
@@ -131,13 +141,13 @@ export async function coletar({ itens: soItens, lojas: soLojas, anterior: bruto,
     const n = Object.keys(r.resultado).length;
     // Uma coleta que trouxe poucos itens provavelmente falhou (site fora do ar, bloqueio): mantém a anterior.
     const ok = n >= Math.max(1, itens.length * 0.25);
-    if (ok) publicadas[l.id] = { data: agora, itens: r.resultado };
-    else if (anterior?.lojas[l.id]) publicadas[l.id] = anterior.lojas[l.id];
+    const loja = juntarLoja(anterior?.lojas[l.id], r.resultado, ok, agora);
+    if (loja) publicadas[l.id] = loja;
     status[l.id] = {
       ok, itens: n, buscas: r.buscas, erros: r.erros, fonte: l.fonte, data: publicadas[l.id]?.data,
       ...(r.parou ? { parou: r.parou } : {}), ...(r.exemplos.length ? { exemplosErro: r.exemplos } : {}),
     };
-    log(`${l.nome}: ${n} itens com preço · ${r.buscas} buscas · ${r.erros} erros${ok ? '' : ' (mantidos os preços anteriores)'}`);
+    log(`${l.nome}: ${n} itens com preço · ${r.buscas} buscas · ${r.erros} erros${ok ? '' : ' (coleta fraca: o resto fica com os preços anteriores)'}`);
     if (r.parou) log(`   parou: ${r.parou}`);
     for (const e of r.exemplos) log('   ' + e);
   }

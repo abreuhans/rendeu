@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { ITEM, ancorasDoSite, lerPrecosSite, lojasValidas, opcoesItem, planejar, tabela, type PrecosSite } from '../src/core';
+import { juntarLoja } from '../robo/coleta';
 import { candidatas, escolherOfertas, produtoServe } from '../robo/escolher';
 import { BUSCAS } from '../robo/itens';
 import { LOJAS, lerOsuper, lerVtex, type Produto } from '../robo/lojas';
@@ -67,6 +68,17 @@ describe('robô: leitura dos sites', () => {
   it('todo item do catálogo tem busca configurada e toda loja tem fonte', () => {
     for (const l of LOJAS) expect(l.url('arroz tipo 1')).toMatch(/^https:\/\//);
     expect(Object.values(BUSCAS).every(b => b.busca.length > 0)).toBe(true);
+  });
+});
+
+describe('robô: o que publicar quando a loja falha', () => {
+  const arroz = [{ tamanho: 1000, preco: 3.88, nome: 'Arroz' }];
+  const leite = [{ tamanho: 1000, preco: 4.78, nome: 'Leite' }];
+  it('coleta boa substitui; fraca só atualiza o que veio e mantém a data antiga', () => {
+    expect(juntarLoja({ data: 'ontem', itens: { leite } }, { arroz }, true, 'hoje')).toEqual({ data: 'hoje', itens: { arroz } });
+    expect(juntarLoja({ data: 'ontem', itens: { leite } }, { arroz }, false, 'hoje')).toEqual({ data: 'ontem', itens: { leite, arroz } });
+    expect(juntarLoja(undefined, { arroz }, false, 'hoje')).toEqual({ data: 'hoje', itens: { arroz } });
+    expect(juntarLoja(undefined, {}, false, 'hoje')).toBeUndefined();
   });
 });
 
