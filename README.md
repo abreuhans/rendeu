@@ -49,7 +49,8 @@ Não precisa de Mac nem de Xcode para testar. Para publicar nas lojas, o build �
 | `npm run export:web` | Gera a versão web em `dist/` |
 | `node tests/e2e-app.cjs dist` | Teste de ponta a ponta da versão web (precisa do Playwright instalado) |
 | `npm run prototipo -- saida.html` | Gera o protótipo web de um arquivo só (em `web/prototipo`) |
-| `npm run robo` | Roda o robô de preços no seu computador e grava `saida/precos.json` (aceita `-- --itens=arroz,tomate --lojas=giassi`) |
+| `npm run robo` | Roda o robô de preços no seu computador e só grava `saida/precos.json` (aceita `-- --itens=arroz,tomate --lojas=giassi`) |
+| `npm run robo:publicar` | Roda o robô no seu computador e publica os preços no branch `precos` (o app passa a usar) |
 
 ## Estrutura
 
@@ -110,7 +111,10 @@ O app usa, para cada produto em cada mercado, a melhor fonte disponível, nesta 
 | Bistek | Estimativa: o `robots.txt` do site proíbe robôs em `/api/` |
 | Komprão, Fort, Imperatriz | Estimativa: não têm loja online com preço |
 
-- **Quando roda:** o GitHub Actions (`.github/workflows/precos.yml`) roda o robô às 06:17 e às 17:47 (horário de Brasília). Também roda quando o robô ou o catálogo mudam, e manualmente pelo botão **Run workflow** na aba **Actions**.
+- **Quando roda:**
+  - o GitHub Actions (`.github/workflows/precos.yml`) roda o robô às 06:17 e às 17:47 (horário de Brasília);
+  - também roda quando o robô ou o catálogo mudam, e manualmente pelo botão **Run workflow** na aba **Actions**;
+  - ou no seu computador, com `npm run robo:publicar` (veja abaixo).
 - **O que o robô faz:**
   - procura cada um dos 108 itens com termos e filtros próprios (`robo/itens.ts`);
   - só aceita o produto que as regras de leitura de nota também reconhecem;
@@ -129,10 +133,41 @@ O app usa, para cada produto em cada mercado, a melhor fonte disponível, nesta 
   - confere o `robots.txt` antes de buscar;
   - se identifica (`RendeuBot`) e faz cerca de uma busca por segundo em cada loja.
   - Antes de publicar o app nas lojas, vale pedir autorização ou propor parceria aos mercados.
+- **Situação em 22/10/2026:** a primeira coleta pelo GitHub Actions foi recusada por todos os sites.
+  - Giassi e Angeloni responderam "429, pedidos demais"; Koch e Hippo responderam "403, acesso recusado".
+  - As mesmas buscas funcionam fora de datacenter: as respostas em `robo/amostras/` são reais.
+  - O robô não se disfarça para passar pelo bloqueio. Quando um site recusa 6 buscas seguidas, ele para e anota o motivo no `status`.
+  - Enquanto isso, quem traz os preços é a coleta pelo seu computador.
 - **Limites:**
   - o preço do site pode ser diferente do da loja física;
   - preço de clube (com CPF) não entra;
   - "tempo real" aqui quer dizer "atualizado duas vezes por dia".
+
+### Coletar pelo seu computador (Windows)
+
+A internet de casa não é bloqueada como os servidores do GitHub. Na pasta do projeto, com o git conectado à sua conta do GitHub (o mesmo login do `git push`):
+
+```powershell
+npm run robo:publicar
+```
+
+O comando:
+
+- leva uns 5 minutos;
+- busca os 108 itens no Giassi, Angeloni, Koch e Hippo;
+- grava `saida/precos.json`;
+- publica o arquivo num commit novo do branch `precos`, sem mexer no que você está editando.
+
+O app pega os preços novos na próxima vez que abrir. Loja que falhar continua com os preços anteriores.
+
+Para rodar sozinho todo dia, crie duas tarefas no Agendador de Tarefas. No **Prompt de Comando**, troque o caminho pela pasta do projeto:
+
+```bat
+schtasks /Create /TN "Rendeu precos manha" /SC DAILY /ST 06:30 /TR "cmd /c cd /d C:\caminho\rendeu && npm run robo:publicar"
+schtasks /Create /TN "Rendeu precos tarde" /SC DAILY /ST 17:30 /TR "cmd /c cd /d C:\caminho\rendeu && npm run robo:publicar"
+```
+
+O computador precisa estar ligado nesses horários. No Agendador de Tarefas, marque "Executar a tarefa o mais cedo possível após uma inicialização agendada ser perdida".
 
 ### Notas fiscais (NFC-e)
 
@@ -165,7 +200,9 @@ O app usa, para cada produto em cada mercado, a melhor fonte disponível, nesta 
 
 ## Próximos passos sugeridos
 
-- Acompanhar as primeiras coletas do robô no branch `precos` e ajustar os termos de busca dos itens que vierem sem preço.
+- Rodar `npm run robo:publicar` e ajustar os termos de busca (`robo/itens.ts`) dos itens que vierem sem preço ou com o produto errado.
+- Pedir aos mercados autorização para o robô (ou um arquivo de preços oficial). Com isso, a coleta automática do GitHub volta a funcionar.
+- Buscar os preços direto do celular, só para os itens da lista e com aviso do consumo de dados. Funciona para quem não usa o computador.
 - Servidor gratuito (Supabase) para juntar as notas fiscais de todos os usuários. Isso cobre o Komprão, o Fort, o Bistek e o Imperatriz, que não têm site com preço.
 - Pedido de dados à Sefaz/SC (veja `docs/`).
 - CEP e localização para sugerir as lojas mais perto.

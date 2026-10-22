@@ -376,7 +376,7 @@ export function Bastidores({ plano }: { plano: Plano }) {
   const p = plano.prefs;
   const st = plano.meta.stats;
   const itens: [string, string][] = [
-    ['Preços', `${ITENS.length} produtos com preço por embalagem em ${p.mercados.length} ${plural(p.mercados.length, 'mercado', 'mercados')}. Um robô lê os sites do Angeloni, Giassi, Koch e Hippo de manhã e no fim da tarde; os outros mercados são estimados a partir desses preços.`],
+    ['Preços', `${ITENS.length} produtos com preço por embalagem em ${p.mercados.length} ${plural(p.mercados.length, 'mercado', 'mercados')}. Um robô lê os sites do Angeloni, Giassi, Koch e Hippo; os outros mercados (e o que o robô não conseguir ler) são estimados a partir desses preços.`],
     ['Filtro de receitas', `${st.total} receitas no catálogo → ${st.combinam} combinam com sua dieta, restrições e gostos → ${st.possiveis} dá para fazer com seus aparelhos.`],
     ['Otimização', `${numero(plano.meta.rodadas)} cardápios simulados. O escolhido custa ${dinheiro(plano.custo.total)} (limite ${dinheiro(p.orcamento)}). Conta embalagens inteiras e reaproveita o que sobra de uma receita na outra.`],
     ['Passo a passo', 'Cada etapa de cozimento tem versões para fogão, forno, micro-ondas, air fryer, panela de pressão e outros. Você vê a do aparelho que tem.'],

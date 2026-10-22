@@ -58,7 +58,7 @@ export default function Inicio() {
       </View>
       <SituacaoPrecos />
       <Nota>
-        Mercados reais da Grande Florianópolis. Angeloni, Giassi, Koch e Hippo têm preço do site, lido duas vezes por dia; Komprão, Fort, Bistek e Imperatriz não vendem online e são estimados a partir dos outros. Uma nota fiscal sua vale mais que tudo.
+        Mercados reais da Grande Florianópolis. Angeloni, Giassi, Koch e Hippo vendem online: o app usa os preços dos sites sempre que o robô consegue lê-los. Komprão, Fort, Bistek e Imperatriz são estimados a partir dos outros. Uma nota fiscal sua vale mais que tudo.
       </Nota>
 
       <Cartao style={{ marginTop: 22, padding: 18, gap: 8 }}>
@@ -66,7 +66,7 @@ export default function Inicio() {
         {[
           'Conta embalagens inteiras (ninguém compra ⅓ de bandeja de frango), reaproveita sobras entre receitas e nunca passa do orçamento.',
           'O passo a passo muda conforme os aparelhos que você tem: fogão, forno, air fryer, micro-ondas, panela de pressão…',
-          'Preços de verdade: um robô lê os sites dos mercados de manhã e no fim da tarde, e você ainda pode ler o QR Code da nota fiscal (NFC-e) das suas compras.',
+          'Preços de verdade: um robô lê os sites dos mercados, e você ainda pode ler o QR Code da nota fiscal (NFC-e) das suas compras.',
         ].map(t => (
           <View key={t} style={{ flexDirection: 'row', gap: 8 }}>
             <Text style={{ fontFamily: FONTES.textoNegrito, color: c.folha, fontSize: 14 }}>•</Text>

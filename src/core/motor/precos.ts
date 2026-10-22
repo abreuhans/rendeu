@@ -110,6 +110,7 @@ const ancoras = new WeakMap<Record<string, LojaSite>, Record<string, number>>();
  * Quanto o preço de cada item nos sites está acima ou abaixo da referência do catálogo
  * (mediana entre as lojas, já descontado o nível de preço de cada loja). Serve para
  * estimar os mercados sem site acompanhando o preço de verdade (ex.: tomate subiu 40%).
+ * A chave '*' é o ajuste geral (mediana dos itens), usado nos itens que nenhum site trouxe.
  */
 export function ancorasDoSite(lojas: Record<string, LojaSite>): Record<string, number> {
   let a = ancoras.get(lojas);
@@ -127,6 +128,8 @@ export function ancorasDoSite(lojas: Record<string, LojaSite>): Record<string, n
     const mediana = vals.length % 2 ? vals[Math.floor(meio)] : (vals[meio - 1] + vals[meio]) / 2;
     a[id] = Math.max(0.5, Math.min(2, mediana / unitarioCatalogo(id)));
   }
+  const todos = Object.values(a).sort((x, y) => x - y);
+  if (todos.length >= 8) a['*'] = Math.max(0.7, Math.min(1.4, todos[Math.floor(todos.length / 2)]));
   ancoras.set(lojas, a);
   return a;
 }
@@ -150,7 +153,8 @@ export function opcoesItem(itemId: string, mercadoId: string, fontes?: FontesPre
       tamanho: o.tamanho, preco: o.preco, rotulo: o.nome, oferta: !!o.promo, real: false, site: true, ...(o.kg ? { kg: o.kg } : {}),
     }));
   }
-  const ancora = ancorasDoSite(lojas)[itemId] ?? 1;
+  const anc = ancorasDoSite(lojas);
+  const ancora = anc[itemId] ?? anc['*'] ?? 1;
   const mult = m.fator * ancora * (1 + ((hash(mercadoId + ':' + itemId) % 19) - 9) / 100);
   if (it.granel) {
     const { pesoUn } = it.granel;

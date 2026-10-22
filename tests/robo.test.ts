@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { ancorasDoSite, lerPrecosSite, opcoesItem, planejar, tabela, type PrecosSite } from '../src/core';
+import { ITEM, ancorasDoSite, lerPrecosSite, lojasValidas, opcoesItem, planejar, tabela, type PrecosSite } from '../src/core';
 import { candidatas, escolherOfertas, produtoServe } from '../robo/escolher';
 import { BUSCAS } from '../robo/itens';
 import { LOJAS, lerOsuper, lerVtex, type Produto } from '../robo/lojas';
@@ -115,6 +115,23 @@ describe('preços do site no app', () => {
     const ancorado = opcoesItem('tomate', 'komprao', { site, agora })[0].kg!;
     expect(ancorasDoSite({ giassi: site.lojas.giassi, angeloni: site.lojas.angeloni }).tomate).toBeGreaterThan(1.5);
     expect(ancorado).toBeGreaterThan(semSite * 1.4);
+  });
+
+  it('itens que nenhum site trouxe seguem o nível geral de preço dos sites', () => {
+    const itens = ['arroz', 'feijao_preto', 'macarrao', 'oleo', 'acucar', 'leite', 'ovos', 'cafe', 'farinha_trigo'];
+    const barato: PrecosSite = {
+      versao: 1,
+      geradoEm: '2026-10-22T09:17:00Z',
+      lojas: { koch: { data: '2026-10-22T09:17:00Z', itens: Object.fromEntries(itens.map(id => {
+        const [t, preco] = (ITEM[id].pk || [])[0];
+        return [id, [{ tamanho: t, preco: Math.round(preco * 0.8 * 0.98 * 100) / 100, nome: id }]];
+      })) } },
+    };
+    expect(ancorasDoSite(lojasValidas(barato, agora))['*']).toBeCloseTo(0.8, 1);
+    const sem = opcoesItem('lentilha', 'komprao')[0].preco;
+    const com = opcoesItem('lentilha', 'komprao', { site: barato, agora })[0].preco;
+    expect(com / sem).toBeGreaterThan(0.7);
+    expect(com / sem).toBeLessThan(0.9);
   });
 
   it('nota fiscal recente vale mais que o site; antiga não', () => {

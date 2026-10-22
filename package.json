@@ -46,6 +46,7 @@
     "export:web": "expo export --platform web",
     "prototipo": "node scripts/prototipo.mjs",
     "robo": "esbuild robo/coletar.ts --bundle --platform=node --format=esm --outfile=.robo/coletar.mjs --log-level=warning && node .robo/coletar.mjs saida/precos.json saida/precos.json",
+    "robo:publicar": "esbuild robo/publicar.ts --bundle --platform=node --format=esm --outfile=.robo/publicar.mjs --log-level=warning && node .robo/publicar.mjs",
     "lint": "expo lint"
   },
   "private": true
