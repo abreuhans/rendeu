@@ -59,6 +59,8 @@ describe('robô: leitura dos sites', () => {
     expect(produtoServe('leite', produto('Leite Integral Tirol 1L C/12', 57.36))).toBe(false);
     expect(produtoServe('leite', produto('Leite Condensado Moça 395g', 7.99))).toBe(false);
     expect(produtoServe('arroz', produto('Arroz Luppy Cachorro Pacote 5kg', 15.9))).toBe(false);
+    expect(produtoServe('camarao', produto('Camarão Cinza Descascado Congelado 400g', 39.9))).toBe(true);
+    expect(produtoServe('camarao', produto('Camarão Inteiro com Casca kg', 49.9, { porKg: true }))).toBe(false);
     expect(escolherOfertas('arroz', [produto('Arroz Branco Tipo 1 Pacote 1kg', 0.5)])).toEqual([]);
   });
 
