@@ -1,0 +1,429 @@
+{
+ "recordsFiltered": 42,
+ "products": [
+  {
+   "productId": "786934",
+   "productName": "Tomate Italiano Kg",
+   "brand": "HORTIFRUTI",
+   "link": "/tomate-italiano-kg-786934/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "1.000"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Sim"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "786934",
+     "name": "Tomate Italiano Kg",
+     "measurementUnit": "kg",
+     "unitMultiplier": 0.2,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 15.39,
+        "ListPrice": 15.39,
+        "PriceWithoutDiscount": 15.39,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "255203",
+   "productName": "Tomate Kg",
+   "brand": "HORTIFRUTI",
+   "link": "/tomate-kg-255203/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "1.000"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Sim"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "255203",
+     "name": "Tomate Kg",
+     "measurementUnit": "kg",
+     "unitMultiplier": 0.2,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 14.89,
+        "ListPrice": 14.89,
+        "PriceWithoutDiscount": 14.89,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "223670",
+   "productName": "Tomate Grape Kg",
+   "brand": "HORTIFRUTI",
+   "link": "/tomate-grape-kg-223670/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "1.000"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Sim"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "223670",
+     "name": "Tomate Grape Kg",
+     "measurementUnit": "kg",
+     "unitMultiplier": 0.2,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 34.89,
+        "ListPrice": 34.89,
+        "PriceWithoutDiscount": 34.89,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "3698479",
+   "productName": "Tomate Italiano Centenario KRUPA 450g",
+   "brand": "KRUPA",
+   "link": "/tomate-italiano-centenario-krupa-450g-3698479/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "0.450"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Não"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "3698479",
+     "name": "Tomate Italiano Centenario KRUPA 450g",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 8.89,
+        "ListPrice": 8.89,
+        "PriceWithoutDiscount": 8.89,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "3698460",
+   "productName": "Tomate Sweet Heavem KRUPA 300g",
+   "brand": "KRUPA",
+   "link": "/tomate-sweet-heavem-krupa-300g-3698460/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "0.300"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Não"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "3698460",
+     "name": "Tomate Sweet Heavem KRUPA 300g",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 14.29,
+        "ListPrice": 14.29,
+        "PriceWithoutDiscount": 14.29,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "4533974",
+   "productName": "Tomate Grape Orgânico 180g",
+   "brand": "HORTIFRUTI",
+   "link": "/tomate-grape-organico-180g-4533974/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "0.180"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Não"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "4533974",
+     "name": "Tomate Grape Orgânico 180g",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 7.75,
+        "ListPrice": 7.75,
+        "PriceWithoutDiscount": 7.75,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "5225774",
+   "productName": "Tomate Grape AGRICOLA PREMIUM 150g",
+   "brand": "AGRICOLA PREMIUM",
+   "link": "/5225774-tomate-grape-agricola-premium-150g-1/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "0.150"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Não"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "5225774",
+     "name": "Tomate  AGRICOLA PREMIUM 150g",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 7.25,
+        "ListPrice": 7.25,
+        "PriceWithoutDiscount": 7.25,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "4533983",
+   "productName": "Tomate Italiano Orgânico 500g",
+   "brand": "HORTIFRUTI",
+   "link": "/tomate-italiano-organico-500g-4533983/p",
+   "categories": [
+    "/Hortifruti/Legumes/",
+    "/Hortifruti/"
+   ],
+   "properties": [
+    {
+     "name": "Unidade de medida",
+     "originalName": "Unidade de medida",
+     "values": [
+      "kg"
+     ]
+    },
+    {
+     "name": "Quantidade da embalagem",
+     "originalName": "Quantidade da embalagem",
+     "values": [
+      "0.500"
+     ]
+    },
+    {
+     "name": "Produto pesado",
+     "originalName": "Produto pesado",
+     "values": [
+      "Não"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "4533983",
+     "name": "Tomate Italiano Orgânico 500g",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 11.49,
+        "ListPrice": 11.49,
+        "PriceWithoutDiscount": 11.49,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

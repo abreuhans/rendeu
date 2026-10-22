@@ -3,6 +3,7 @@
 export * from './tipos';
 export * from './dados';
 export * from './motor/precos';
+export * from './motor/site';
 export * from './motor/planejador';
 export * from './motor/formatos';
 export * from './motor/passos';

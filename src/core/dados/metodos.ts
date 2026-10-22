@@ -435,4 +435,222 @@ export const METODOS: Record<string, Metodo> = {
     ordem: ['microondas'],
     v: { microondas: 'Misture tudo numa caneca grande untada, até ficar liso, e aqueça no micro-ondas por 1½–2 min.' },
   },
+  // Métodos das receitas novas (out/2026).
+  lentilha: {
+    ordem: ['pressao', 'pressao_eletrica', 'fogao'],
+    v: {
+      pressao: 'Lave a lentilha (não precisa de molho) e cozinhe na panela de pressão com 3 partes de água e sal por 6–8 min depois que pegar pressão.',
+      pressao_eletrica: 'Lave a lentilha e cozinhe na panela de pressão elétrica com 3 partes de água e sal por 10 min.',
+      fogao: 'Lave a lentilha e cozinhe numa panela com 3 partes de água e sal, tampada, por 20–25 min, até ficar macia sem desmanchar.',
+    },
+  },
+  grao_bico: {
+    ordem: ['pressao', 'pressao_eletrica', 'fogao'],
+    dica: 'Cozinhe o pacote todo e congele em porções: dura 3 meses no congelador.',
+    v: {
+      pressao: 'Deixe o grão-de-bico de molho por 8–12 h e escorra. Cozinhe na panela de pressão com 3 partes de água e sal por 25–30 min depois que pegar pressão.',
+      pressao_eletrica: 'Deixe o grão-de-bico de molho por 8–12 h e escorra. Cozinhe com 3 partes de água e sal por 35 min (função feijão).',
+      fogao: 'Deixe o grão-de-bico de molho por 8–12 h e escorra. Cozinhe numa panela com bastante água e sal, tampada, por 1h30 a 2h, até ficar macio.',
+    },
+  },
+  risoto: {
+    ordem: ['fogao', 'pressao_eletrica'],
+    v: {
+      fogao: 'Refogue a cebola e o alho no óleo, junte o arroz e mexa por 1 min. Acrescente {item}. Vá juntando água quente com o caldo dissolvido, 1 concha por vez, mexendo sempre, por 18–20 min, até o arroz ficar macio e cremoso.',
+      pressao_eletrica: 'Na função dourar, refogue a cebola e o alho, junte o arroz por 1 min e acrescente {item}. Junte água quente com o caldo (2½ partes para 1 de arroz) e programe 5 min de pressão, com liberação rápida. Mexa bem.',
+    },
+  },
+  frango_molho: {
+    ordem: ['pressao', 'pressao_eletrica', 'fogao'],
+    v: {
+      pressao: 'Tempere o frango com sal e alho e doure na panela de pressão com óleo e a cebola. Junte o tomate picado, o colorau e ½ xícara de água e cozinhe por 12 min depois que pegar pressão.',
+      pressao_eletrica: 'Tempere o frango com sal e alho e doure na função dourar com a cebola. Junte o tomate picado, o colorau e ½ xícara de água e programe 12 min de pressão.',
+      fogao: 'Tempere o frango com sal e alho e doure numa panela com óleo e a cebola. Junte o tomate picado, o colorau e 1 xícara de água, tampe e cozinhe em fogo baixo por 30–35 min, até ficar macio.',
+    },
+  },
+  costela: {
+    ordem: ['pressao', 'pressao_eletrica', 'forno', 'fogao'],
+    v: {
+      pressao: 'Tempere a costela com sal, alho e pimenta e doure os pedaços na própria panela de pressão com um fio de óleo. Junte a cebola, água até cobrir e cozinhe por 45–50 min depois que pegar pressão, até soltar do osso.',
+      pressao_eletrica: 'Tempere a costela com sal, alho e pimenta e doure na função dourar. Junte a cebola, água até cobrir e programe 50 min de pressão.',
+      forno: 'Tempere a costela com sal, alho e pimenta, embrulhe bem em papel-alumínio com a cebola e asse a 180 °C por 3 h. Abra o papel e doure por mais 20 min a 220 °C.',
+      fogao: 'Tempere a costela com sal, alho e pimenta e doure numa panela grande com a cebola. Cubra com água, tampe e cozinhe em fogo baixo por cerca de 3 h, completando a água, até soltar do osso.',
+    },
+  },
+  figado: {
+    ordem: ['fogao', 'airfryer'],
+    v: {
+      fogao: 'Corte o fígado em tiras e tempere com sal, alho e limão. Frite em fogo alto com um fio de óleo por 3–4 min, mexendo, só até perder o rosado (cozinhar demais endurece).',
+      airfryer: 'Corte o fígado em tiras, tempere com sal, alho e limão e leve à air fryer a 200 °C por 8–10 min, mexendo na metade.',
+    },
+  },
+  lombo_assado: {
+    ordem: ['forno', 'airfryer', 'pressao', 'pressao_eletrica'],
+    v: {
+      forno: 'Tempere o lombo com sal, alho, limão e pimenta (se puder, na véspera). Asse coberto com papel-alumínio a 200 °C por 50 min; retire o papel e doure por mais 20–25 min.',
+      airfryer: 'Corte o lombo temperado (sal, alho, limão e pimenta) em medalhões de 3 cm e leve à air fryer a 180 °C por 25–30 min, virando na metade.',
+      pressao: 'Tempere o lombo com sal, alho, limão e pimenta e doure na própria panela de pressão com um fio de óleo. Junte ½ xícara de água e cozinhe por 25 min depois que pegar pressão. Fatie e regue com o caldo.',
+      pressao_eletrica: 'Tempere o lombo e doure na função dourar. Junte ½ xícara de água e programe 25 min de pressão. Fatie e regue com o caldo.',
+    },
+  },
+  lombo_bifes: {
+    ordem: ['fogao', 'sanduicheira', 'airfryer'],
+    v: {
+      fogao: 'Tempere os bifes de lombo com sal, alho e limão. Frite numa frigideira com um fio de óleo em fogo médio, 3–4 min de cada lado, até não ficarem rosados por dentro.',
+      sanduicheira: 'Tempere os bifes de lombo com sal, alho e limão e grelhe na sanduicheira fechada por 6–7 min.',
+      airfryer: 'Tempere os bifes de lombo com sal, alho e limão e leve à air fryer a 200 °C por 12–14 min, virando na metade.',
+    },
+  },
+  asa_assada: {
+    ordem: ['airfryer', 'forno', 'fogao'],
+    v: {
+      airfryer: 'Tempere a coxinha da asa com sal, alho, limão e páprica (se tiver). Leve à air fryer a 200 °C por 20–25 min, virando na metade, até dourar.',
+      forno: 'Tempere a coxinha da asa com sal, alho, limão e páprica (se tiver) e asse numa assadeira a 220 °C por 40–45 min, virando na metade.',
+      fogao: 'Tempere a coxinha da asa e coloque numa frigideira grande com um fio de óleo. Tampe e cozinhe em fogo médio por 15 min, virando; destampe e doure por mais 8–10 min.',
+    },
+  },
+  almondegas: {
+    ordem: ['fogao', 'airfryer', 'forno'],
+    v: {
+      fogao: 'Misture a carne moída com o ovo, a farinha, a cebola ralada, o alho e sal. Faça bolinhas de 3 cm e doure numa frigideira com óleo, virando, por 6–8 min.',
+      airfryer: 'Misture a carne moída com o ovo, a farinha, a cebola ralada, o alho e sal. Faça bolinhas de 3 cm e leve à air fryer a 180 °C por 12–15 min, sacudindo na metade.',
+      forno: 'Misture a carne moída com o ovo, a farinha, a cebola ralada, o alho e sal. Faça bolinhas de 3 cm e asse numa assadeira untada a 200 °C por 20 min.',
+    },
+  },
+  bolo_carne: {
+    ordem: ['forno', 'airfryer', 'microondas'],
+    v: {
+      forno: 'Misture a carne moída com o ovo, a farinha, a cebola ralada, o alho e sal. Aperte numa forma de bolo inglês untada, cubra com o molho e asse a 200 °C por 40–45 min.',
+      airfryer: 'Misture a carne moída com o ovo, a farinha, a cebola ralada, o alho e sal. Aperte numa forma que caiba na air fryer, cubra com o molho e asse a 170 °C por 30–35 min.',
+      microondas: 'Misture a carne moída com o ovo, a farinha, a cebola ralada, o alho e sal. Aperte numa travessa de vidro, cubra com o molho e aqueça por 12–14 min na potência alta. Descanse 5 min antes de cortar.',
+    },
+  },
+  bolo: {
+    ordem: ['forno', 'airfryer', 'microondas'],
+    v: {
+      forno: 'Despeje a massa numa forma untada e enfarinhada e asse a 180 °C por 35–40 min, até o palito sair limpo.',
+      airfryer: 'Despeje a massa numa forma untada que caiba na air fryer e asse a 160 °C por 25–30 min, até o palito sair limpo.',
+      microondas: 'Despeje a massa numa forma de vidro ou de silicone untada e aqueça por 6–8 min na potência alta. Deixe descansar 5 min.',
+    },
+  },
+  cookies: {
+    ordem: ['forno', 'airfryer'],
+    v: {
+      forno: 'Faça bolinhas, achate numa assadeira untada e asse a 180 °C por 15–18 min, até dourar as bordas.',
+      airfryer: 'Faça bolinhas achatadas e asse na air fryer, sobre papel-manteiga, a 160 °C por 10–12 min.',
+    },
+  },
+  pastel: {
+    ordem: ['airfryer', 'fogao', 'forno'],
+    v: {
+      airfryer: 'Recheie os discos, feche e aperte as bordas com um garfo. Pincele óleo e asse na air fryer a 200 °C por 8–10 min, virando na metade.',
+      fogao: 'Recheie os discos, feche e aperte as bordas com um garfo. Frite em óleo bem quente, 1–2 min de cada lado, até dourar e estufar. Escorra no papel-toalha.',
+      forno: 'Recheie os discos, feche e aperte as bordas com um garfo. Pincele óleo e asse a 200 °C por 15–20 min, até dourar.',
+    },
+  },
+  pizza_tortilha: {
+    ordem: ['airfryer', 'forno', 'fogao'],
+    v: {
+      airfryer: 'Espalhe o molho na tortilha, cubra com o queijo e a cobertura e leve à air fryer a 180 °C por 5–7 min, até o queijo derreter.',
+      forno: 'Espalhe o molho na tortilha, cubra com o queijo e a cobertura e asse a 220 °C por 8–10 min.',
+      fogao: 'Espalhe o molho na tortilha, cubra com o queijo e a cobertura e leve a uma frigideira tampada em fogo baixo por 5–6 min, até o queijo derreter e a base ficar crocante.',
+    },
+  },
+  polenta_frita: {
+    ordem: ['airfryer', 'forno', 'fogao'],
+    v: {
+      airfryer: 'Corte a polenta firme e fria em palitos grossos, pincele óleo e leve à air fryer a 200 °C por 20–25 min, sem mexer nos primeiros 15 min.',
+      forno: 'Corte a polenta firme e fria em palitos, arrume numa assadeira untada, pincele óleo e asse a 220 °C por 35–40 min, virando na metade.',
+      fogao: 'Corte a polenta firme e fria em palitos e frite em óleo bem quente, aos poucos, por 4–5 min, até dourar. Escorra no papel-toalha.',
+    },
+  },
+  batata_frita: {
+    ordem: ['airfryer', 'forno', 'fogao'],
+    v: {
+      airfryer: 'Corte {item} em palitos, seque bem num pano, tempere com um fio de óleo e sal e leve à air fryer a 200 °C por 20–25 min, sacudindo o cesto 2 vezes.',
+      forno: 'Corte {item} em palitos, seque bem, tempere com óleo e sal e asse espalhado numa assadeira a 220 °C por 35–40 min, virando na metade.',
+      fogao: 'Corte {item} em palitos, seque bem e frite em óleo quente, aos poucos, por 6–8 min, até dourar. Escorra no papel-toalha e salgue.',
+    },
+  },
+  carne_seca: {
+    ordem: ['pressao', 'pressao_eletrica', 'fogao'],
+    v: {
+      pressao: 'Escorra a carne seca dessalgada, cubra com água nova e cozinhe na panela de pressão por 20–25 min depois que pegar pressão. Escorra e desfie.',
+      pressao_eletrica: 'Escorra a carne seca dessalgada, cubra com água nova e programe 25 min de pressão. Escorra e desfie.',
+      fogao: 'Escorra a carne seca dessalgada, cubra com água nova e cozinhe tampado por 50–60 min, até ficar macia. Escorra e desfie.',
+    },
+  },
+  bife_role: {
+    ordem: ['pressao', 'pressao_eletrica', 'fogao'],
+    v: {
+      pressao: 'Doure os rolinhos na panela de pressão com um fio de óleo. Junte a cebola, o molho de tomate e 1 xícara de água e cozinhe por 20 min depois que pegar pressão.',
+      pressao_eletrica: 'Doure os rolinhos na função dourar. Junte a cebola, o molho de tomate e 1 xícara de água e programe 20 min de pressão.',
+      fogao: 'Doure os rolinhos numa panela com óleo. Junte a cebola, o molho de tomate e 2 xícaras de água, tampe e cozinhe em fogo baixo por 50–60 min, virando e completando a água.',
+    },
+  },
+  peixe_ensopado: {
+    ordem: ['fogao', 'pressao_eletrica'],
+    v: {
+      fogao: 'Refogue a cebola, o alho e o tomate no óleo, junte 2 xícaras de água e deixe ferver. Coloque {item} temperado com sal e limão, tampe e cozinhe em fogo baixo por 10–12 min, sem mexer. Guarde o caldo.',
+      pressao_eletrica: 'Na função dourar, refogue a cebola, o alho e o tomate, junte 2 xícaras de água e deixe ferver. Coloque {item} temperado com sal e limão e cozinhe tampado por 10–12 min, sem pressão. Guarde o caldo.',
+    },
+  },
+  pirao: {
+    ordem: ['fogao', 'microondas'],
+    v: {
+      fogao: 'Leve 1 xícara do caldo ao fogo e junte a farinha de mandioca aos poucos, mexendo sem parar, por 3–4 min, até virar um creme grosso.',
+      microondas: 'Numa tigela, misture a farinha de mandioca a 1 xícara do caldo quente. Aqueça 1 min, mexa e aqueça mais 1 min, até engrossar.',
+    },
+  },
+  marisco: {
+    ordem: ['fogao', 'microondas'],
+    v: {
+      fogao: 'Cozinhe o marisco numa panela tampada com ½ xícara de água por 3–4 min depois de ferver (o limpo congelado não precisa de mais). Escorra.',
+      microondas: 'Coloque o marisco numa tigela tampada com 2 colheres de água e aqueça por 3–4 min, mexendo na metade. Escorra.',
+    },
+  },
+  ovos_molho: {
+    ordem: ['fogao', 'forno', 'microondas'],
+    v: {
+      fogao: 'Numa frigideira, refogue a cebola, o alho e o pimentão no óleo, junte o molho de tomate e deixe apurar 5 min. Abra espaços, quebre os ovos dentro, tampe e cozinhe por 6–8 min, até as claras firmarem.',
+      forno: 'Misture a cebola, o alho e o pimentão picados ao molho de tomate numa travessa, quebre os ovos por cima e asse a 200 °C por 12–15 min.',
+      microondas: 'Misture a cebola, o alho e o pimentão picados ao molho numa tigela e aqueça 3 min. Quebre os ovos por cima, fure as gemas com um garfo, cubra e aqueça por 1½–2 min.',
+    },
+  },
+  bacon: {
+    ordem: ['fogao', 'airfryer', 'microondas'],
+    v: {
+      fogao: 'Frite o bacon numa frigideira sem óleo, em fogo médio, por 5–6 min, até dourar. Escorra o excesso de gordura.',
+      airfryer: 'Leve o bacon à air fryer a 180 °C por 8–10 min, mexendo na metade.',
+      microondas: 'Espalhe o bacon num prato entre folhas de papel-toalha e aqueça por 2–3 min, até dourar.',
+    },
+  },
+  muffin_ovo: {
+    ordem: ['forno', 'airfryer', 'microondas'],
+    v: {
+      forno: 'Distribua a mistura em forminhas de muffin untadas (até ¾) e asse a 180 °C por 18–22 min.',
+      airfryer: 'Distribua a mistura em forminhas de silicone e asse na air fryer a 160 °C por 12–15 min.',
+      microondas: 'Distribua a mistura em xícaras untadas e aqueça cada uma por 1–1½ min.',
+    },
+  },
+  chips: {
+    ordem: ['airfryer', 'forno', 'microondas'],
+    v: {
+      airfryer: 'Corte {item} em lâminas bem finas, tempere com um fio de óleo e sal e leve à air fryer a 160 °C por 15–20 min, mexendo a cada 5 min, até secar.',
+      forno: 'Corte {item} em lâminas bem finas, espalhe numa assadeira com papel-manteiga, pincele óleo e asse a 180 °C por 25–30 min, virando na metade.',
+      microondas: 'Corte {item} em lâminas bem finas e arrume num prato com papel-manteiga, sem sobrepor. Aqueça por 4–6 min, até secar.',
+    },
+  },
+  arroz_frito: {
+    ordem: ['fogao'],
+    v: { fogao: 'Numa frigideira grande bem quente com óleo, mexa os ovos até firmarem, junte os legumes e salteie por 2 min. Acrescente o arroz cozido (de preferência frio) e o shoyu e misture por 3–4 min.' },
+  },
+  nhoque: {
+    ordem: ['fogao'],
+    v: { fogao: 'Faça rolinhos com a massa, corte em pedaços de 2 cm e cozinhe em água fervente com sal, aos poucos: quando subirem à superfície, retire com uma escumadeira.' },
+  },
+  panqueca_americana: {
+    ordem: ['fogao'],
+    v: { fogao: 'Misture a farinha, o leite, o ovo, o açúcar, o fermento e uma pitada de sal até ficar liso. Despeje ¼ de xícara numa frigideira untada em fogo baixo e vire quando aparecerem bolhinhas, 1–2 min de cada lado.' },
+  },
 };

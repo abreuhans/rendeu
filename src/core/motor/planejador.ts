@@ -2,7 +2,7 @@
 // (contando embalagens inteiras e reaproveitando sobras) e permite trocar pratos.
 import { APARELHO_REQUER, ITEM, METODOS, RECEITA, RECEITAS } from '../dados';
 import type { Preferencias, Receita, Refeicao } from '../tipos';
-import { type CustoPlano, type PrecosReais, type Tabela, custoNecessidades, precoUnitarioMinimo, tabela } from './precos';
+import { type CustoPlano, type FontesPreco, PERECIVEIS, type Tabela, custoNecessidades, hash, melhorCompra, precoUnitarioMinimo, tabela } from './precos';
 
 export const ORDEM_REFEICOES: Refeicao[] = ['B', 'L', 'D', 'S'];
 
@@ -18,13 +18,25 @@ export const RESTRICOES: Record<string, string[]> = {
   vegetariana: ['carne', 'peixe'], sem_lactose: ['lactose'], sem_gluten: ['gluten'], sem_amendoim: ['amendoim'],
 };
 
-/** lambda: peso do gasto · desperdicio: peso de perecíveis que sobram */
+/**
+ * Peso do gasto por real (por pessoa): `lambda` até `alvo` × orçamento e `lambdaAlto` acima disso.
+ * Assim, quem tem orçamento folgado ganha pratos melhores e mais variados em vez de sobrar dinheiro à toa.
+ * desperdicio: peso de perecíveis que sobram · guarda: quanto vale o que sobra e dura (carne no congelador,
+ * pacote de arroz aberto), descontado do gasto na nota do plano (o orçamento continua contando tudo).
+ * sabor: bônus sorteado por receita a cada plano, para "refazer" mostrar outras combinações boas.
+ */
 export const ESTILOS = {
-  economia: { lambda: 1.2, desperdicio: 0.6, repete: 0.3, mesmoDia: 4, seguido: 0.3, sobra: 0.9, distintos: 0.05, ruido: 0.5, proteina: 0.1 },
-  equilibrado: { lambda: 0.25, desperdicio: 0.3, repete: 1.5, mesmoDia: 4, seguido: 1.0, sobra: 0.6, distintos: 0.5, ruido: 0.7, proteina: 0.3 },
-  variedade: { lambda: 0.1, desperdicio: 0.2, repete: 2.5, mesmoDia: 5, seguido: 2.0, sobra: 0, distintos: 0.6, ruido: 0.7, proteina: 0.6 },
+  economia: { lambda: 1, lambdaAlto: 1, alvo: 0, guarda: 0.2, sabor: 0.3, desperdicio: 0.6, repete: 0.8, mesmoDia: 4, seguido: 0.5, sobra: 1.1, distintos: 0.3, ruido: 0.5, proteina: 0.1 },
+  equilibrado: { lambda: 0.08, lambdaAlto: 0.45, alvo: 0.7, guarda: 0.35, sabor: 0.7, desperdicio: 0.3, repete: 1.5, mesmoDia: 4, seguido: 1.0, sobra: 0.6, distintos: 0.5, ruido: 0.7, proteina: 0.3 },
+  variedade: { lambda: 0.04, lambdaAlto: 0.3, alvo: 0.9, guarda: 0.5, sabor: 1, desperdicio: 0.2, repete: 2.5, mesmoDia: 5, seguido: 2.0, sobra: 0, distintos: 0.6, ruido: 0.7, proteina: 0.6 },
 } as const;
 type Estilo = Record<keyof (typeof ESTILOS)['economia'], number>;
+
+/** Penalidade do gasto por pessoa `t` para um teto de referência `teto` (parte do orçamento). */
+function pesoGasto(t: number, teto: number, E: Estilo): number {
+  const base = Math.min(t, teto);
+  return E.lambda * base + E.lambdaAlto * (t - base);
+}
 
 export interface LinhaV { id: string; q: number; opt: boolean }
 export interface Nutricao { kcal: number; p: number; c: number; g: number }
@@ -80,6 +92,9 @@ export type Problema =
   | { ok: false; motivo: 'receitas'; refeicao: Refeicao; stats: Plano['meta']['stats'] };
 
 export const temAparelho = (a: string, tem: string[]) => (APARELHO_REQUER[a] || [a]).every(x => tem.includes(x));
+
+/** Ruído de Gumbel pré-calculado (sorteio com peso sem calcular logaritmos no laço). */
+const GUMBEL = Float64Array.from({ length: 4096 }, (_, i) => -Math.log(-Math.log((i + 0.5) / 4096)));
 
 export function rng(semente: number) {
   let a = semente >>> 0;
@@ -170,7 +185,7 @@ export function variante(receita: Receita, r: Refeicao, prefs: Preferencias): Va
   }
   // Arroz com feijão é a base do prato brasileiro: um pequeno bônus.
   const pf = linhas.some(l => l.id === 'arroz') && linhas.some(l => l.id === 'feijao_preto' || l.id === 'feijao_carioca') ? 0.4 : 0;
-  const score = 2.2 * scoreDieta(nut, r, prefs) + scoreGosto(linhas, receita, prefs) + pf;
+  const score = 2.2 * scoreDieta(nut, r, prefs) + scoreGosto(linhas, receita, prefs) + pf + (receita.peso || 0);
   return { key: receita.id + '@' + r, rid: receita.id, refeicao: r, linhas, nut, lowcarb, score, prot: proteinaPrincipal(linhas) };
 }
 
@@ -197,34 +212,75 @@ export function candidatos(prefs: Preferencias) {
   return { cands, stats: { total: RECEITAS.length, combinam: combinam.size, possiveis: possiveis.size } };
 }
 
-function penalidade(v: Variante, i: number, keys: string[], slots: Slot[], getV: (k: string) => Variante, E: Estilo): number {
-  const s = slots[i];
-  let usos = 0, mesmoDia = false, seguido = false, sobra = false;
-  for (let j = 0; j < i; j++) {
-    const o = getV(keys[j]);
-    if (o.rid !== v.rid) continue;
-    usos++;
-    if (slots[j].d === s.d) mesmoDia = true;
-    if (slots[j].d === s.d - 1 && slots[j].r === s.r) seguido = true;
-    if (s.r === 'L' && slots[j].d === s.d - 1 && slots[j].r === 'D' && RECEITA[v.rid] && RECEITA[v.rid].sobra) sobra = true;
+/** Contagens do que já entrou no cardápio, para medir a repetição de cada candidato sem reler o plano. */
+class Historico {
+  private usos = new Map<string, number>();
+  private noDia = new Set<string>();
+  private hoje = new Map<Refeicao, string>();
+  private ontem = new Map<Refeicao, string>();
+  private dia = -1;
+  private prot = new Map<string, number>();
+  private protRid = new Map<string, Map<string, number>>();
+  constructor(private E: Estilo) {}
+
+  limpar() {
+    this.usos.clear(); this.noDia.clear(); this.hoje.clear(); this.ontem.clear(); this.prot.clear(); this.protRid.clear();
+    this.dia = -1;
   }
-  const leve = s.r === 'B' || s.r === 'S' ? 0.5 : 1;
-  let pen = E.repete * usos * leve;
-  if (s.r === 'L' || s.r === 'D') {
-    if (v.prot) {
-      let mesmas = 0;
-      for (let j = 0; j < i; j++) {
-        if (slots[j].r !== 'L' && slots[j].r !== 'D') continue;
-        const o = getV(keys[j]);
-        if (o.rid !== v.rid && o.prot === v.prot) mesmas++;
-      }
+
+  /** Chame ao chegar em cada refeição, antes de medir os candidatos dela. */
+  entrar(s: Slot) {
+    if (s.d === this.dia) return;
+    const velho = this.ontem;
+    this.ontem = this.hoje;
+    if (s.d !== this.dia + 1) this.ontem.clear();
+    velho.clear();
+    this.hoje = velho;
+    this.noDia.clear();
+    this.dia = s.d;
+  }
+
+  penalidade(v: Variante, s: Slot): number {
+    const E = this.E;
+    const usos = this.usos.get(v.rid) || 0;
+    const leve = s.r === 'B' || s.r === 'S' ? 0.5 : 1;
+    let pen = E.repete * usos * leve;
+    if ((s.r === 'L' || s.r === 'D') && v.prot) {
+      const mesmas = (this.prot.get(v.prot) || 0) - (this.protRid.get(v.prot)?.get(v.rid) || 0);
       pen += E.proteina * Math.max(0, mesmas - 2);
     }
+    if (usos) {
+      const sobra = s.r === 'L' && this.ontem.get('D') === v.rid && !!RECEITA[v.rid]?.sobra;
+      if (this.noDia.has(v.rid)) pen += E.mesmoDia;
+      if (this.ontem.get(s.r) === v.rid && !sobra) pen += E.seguido * leve;
+      if (sobra) pen -= E.sobra + E.repete * 0.5;
+    }
+    return pen;
   }
-  if (mesmoDia) pen += E.mesmoDia;
-  if (seguido && !sobra) pen += E.seguido * leve;
-  if (sobra) pen -= E.sobra + E.repete * 0.5;
-  return pen;
+
+  registrar(v: Variante, s: Slot) {
+    this.usos.set(v.rid, (this.usos.get(v.rid) || 0) + 1);
+    this.noDia.add(v.rid);
+    this.hoje.set(s.r, v.rid);
+    if ((s.r === 'L' || s.r === 'D') && v.prot) {
+      this.prot.set(v.prot, (this.prot.get(v.prot) || 0) + 1);
+      let m = this.protRid.get(v.prot);
+      if (!m) this.protRid.set(v.prot, (m = new Map()));
+      m.set(v.rid, (m.get(v.rid) || 0) + 1);
+    }
+  }
+}
+
+/** Soma de (nota da receita − penalidade de repetição) ao longo do cardápio. */
+function notaPratos(vs: Variante[], slots: Slot[], E: Estilo, h = new Historico(E)): number {
+  h.limpar();
+  let s = 0;
+  for (let i = 0; i < vs.length; i++) {
+    h.entrar(slots[i]);
+    s += vs[i].score - h.penalidade(vs[i], slots[i]);
+    h.registrar(vs[i], slots[i]);
+  }
+  return s;
 }
 
 export function custoDe(variantes: Variante[], prefs: Preferencias, tab: Tabela): CustoPlano {
@@ -234,117 +290,214 @@ export function custoDe(variantes: Variante[], prefs: Preferencias, tab: Tabela)
 }
 
 export function avaliar(keys: string[], slots: Slot[], getV: (k: string) => Variante, prefs: Preferencias, tab: Tabela, E: Estilo) {
-  let s = 0;
-  for (let i = 0; i < keys.length; i++) {
-    const v = getV(keys[i]);
-    s += v.score - penalidade(v, i, keys, slots, getV, E);
-  }
-  const custo = custoDe(keys.map(getV), prefs, tab);
-  const distintos = new Set(keys.map(k => getV(k).rid)).size;
-  return { score: s - (E.lambda * custo.total + E.desperdicio * custo.desperdicio) / prefs.pessoas + E.distintos * distintos, total: custo.total };
+  const vs = keys.map(getV);
+  const custo = custoDe(vs, prefs, tab);
+  const distintos = new Set(vs.map(v => v.rid)).size;
+  const H = prefs.pessoas;
+  const gasto = (custo.total - E.guarda * custo.guardado) / H;
+  const score = notaPratos(vs, slots, E) - pesoGasto(gasto, (E.alvo * prefs.orcamento) / H, E) - (E.desperdicio * custo.desperdicio) / H + E.distintos * distintos;
+  return { score, total: custo.total };
 }
 
 function buscar(prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>>, slots: Slot[], tab: Tabela, semente: number, E: Estilo, rodadas: number) {
   const H = prefs.pessoas, B = prefs.orcamento, emCasa = new Set(prefs.despensa);
   const aleatorio = rng(semente);
   const byKey: Record<string, Variante> = {};
-  const unit: Record<string, ReturnType<typeof precoUnitarioMinimo>> = {};
-  const preco = (id: string) => (unit[id] = unit[id] || precoUnitarioMinimo(id, tab));
-  const amort = (v: Variante) => v.linhas.reduce((a, l) => a + (emCasa.has(l.id) ? 0 : l.q * preco(l.id).porUnidade), 0);
   for (const r in cands) for (const v of cands[r as Refeicao]!) byKey[v.key] = v;
   const getV = (k: string) => byKey[k];
+
+  // Cada item vira um número e cada candidato, listas de números: o laço abaixo roda milhares de vezes.
+  const indice = new Map<string, number>();
+  const pacote: number[] = [], precoPacote: number[] = [], unidade: number[] = [], guarda: number[] = [];
+  const linhasDe = new Map<Variante, { ids: Int32Array; qs: Float64Array }>();
+  for (const v of Object.values(byKey)) {
+    const ls = v.linhas.filter(l => !emCasa.has(l.id));
+    const ids = new Int32Array(ls.length), qs = new Float64Array(ls.length);
+    ls.forEach((l, j) => {
+      let k = indice.get(l.id);
+      if (k === undefined) {
+        k = pacote.length;
+        indice.set(l.id, k);
+        const p = precoUnitarioMinimo(l.id, tab);
+        pacote.push(p.menorPacote);
+        precoPacote.push(p.precoMenor);
+        unidade.push(p.porUnidade);
+        // Crédito por unidade que sobra e dura (zero para perecíveis).
+        guarda.push(PERECIVEIS.has(ITEM[l.id].secao) ? 0 : (E.guarda * p.precoMenor) / p.menorPacote);
+      }
+      ids[j] = k;
+      qs[j] = l.q * H;
+    });
+    linhasDe.set(v, { ids, qs });
+  }
+  const amort = (v: Variante) => {
+    const { ids, qs } = linhasDe.get(v)!;
+    let c = 0;
+    for (let j = 0; j < ids.length; j++) c += qs[j] * unidade[ids[j]];
+    return c;
+  };
   const minPorRef: Partial<Record<Refeicao, number>> = {};
   for (const r in cands) minPorRef[r as Refeicao] = Math.min(...cands[r as Refeicao]!.map(amort));
   const reserva = new Array(slots.length + 1).fill(0);
-  for (let i = slots.length - 1; i >= 0; i--) reserva[i] = reserva[i + 1] + (minPorRef[slots[i].r] || 0) * H * 0.75;
+  for (let i = slots.length - 1; i >= 0; i--) reserva[i] = reserva[i + 1] + (minPorRef[slots[i].r] || 0) * 0.75;
+  // Teto de referência acumulado até cada refeição (o gasto barato vale para a semana toda, não só para o começo).
+  const teto = slots.map((_, i) => (E.alvo * B * (i + 1)) / slots.length / H);
 
   let melhor: { keys: string[]; score: number; total: number } | null = null;
   let maisBarato: { keys: string[]; score: number; total: number } | null = null;
+  const estoque = new Float64Array(pacote.length);
+  const hist = new Historico(E);
   for (let rod = 0; rod < rodadas; rod++) {
-    const estoque = new Map<string, number>();
+    estoque.fill(0);
+    hist.limpar();
     const keys: string[] = [];
-    let gasto = 0;
+    let gasto = 0, gastoEfetivo = 0;
     for (let i = 0; i < slots.length; i++) {
+      hist.entrar(slots[i]);
       let pick: Variante | null = null, pickU = -Infinity, fallback: Variante | null = null, fallbackC = Infinity;
       for (const v of cands[slots[i].r]!) {
-        let mc = 0;
-        for (const l of v.linhas) {
-          if (emCasa.has(l.id)) continue;
-          const falta = l.q * H - (estoque.get(l.id) || 0);
-          if (falta > 1e-9) { const p = preco(l.id); mc += Math.ceil(falta / p.menorPacote - 1e-9) * p.precoMenor; }
+        const { ids, qs } = linhasDe.get(v)!;
+        let mc = 0, credito = 0;
+        for (let j = 0; j < ids.length; j++) {
+          const k = ids[j], falta = qs[j] - estoque[k];
+          let pac = 0;
+          if (falta > 1e-9) { pac = Math.ceil(falta / pacote[k] - 1e-9); mc += pac * precoPacote[k]; }
+          // O estoque muda em (pac × pacote − q): sobra que fica guardada vale crédito, usar o guardado custa o crédito de volta.
+          credito += guarda[k] * (pac * pacote[k] - qs[j]);
         }
         if (mc < fallbackC) { fallbackC = mc; fallback = v; }
         if (gasto + mc + reserva[i + 1] > B + 1e-9) continue;
-        const gumbel = -Math.log(-Math.log(aleatorio() * 0.999998 + 0.000001));
-        const u = v.score - (E.lambda * mc) / H - penalidade(v, i, keys, slots, getV, E) + E.ruido * 0.6 * gumbel;
+        const efetivo = Math.max(0, gastoEfetivo + mc - credito);
+        const custo = pesoGasto(efetivo / H, teto[i], E) - pesoGasto(gastoEfetivo / H, teto[i], E);
+        const u = v.score - custo - hist.penalidade(v, slots[i]) + E.ruido * 0.6 * GUMBEL[(aleatorio() * 4096) | 0];
         if (u > pickU) { pickU = u; pick = v; }
       }
       const v = (pick || fallback)!;
-      for (const l of v.linhas) {
-        if (emCasa.has(l.id)) continue;
-        const nec = l.q * H, tem = estoque.get(l.id) || 0;
-        if (nec > tem + 1e-9) {
-          const p = preco(l.id);
-          const pac = Math.ceil((nec - tem) / p.menorPacote - 1e-9);
-          gasto += pac * p.precoMenor;
-          estoque.set(l.id, tem + pac * p.menorPacote - nec);
-        } else estoque.set(l.id, tem - nec);
+      const { ids, qs } = linhasDe.get(v)!;
+      for (let j = 0; j < ids.length; j++) {
+        const k = ids[j], tem = estoque[k];
+        let pac = 0;
+        if (qs[j] > tem + 1e-9) {
+          pac = Math.ceil((qs[j] - tem) / pacote[k] - 1e-9);
+          gasto += pac * precoPacote[k];
+          gastoEfetivo += pac * precoPacote[k];
+        }
+        gastoEfetivo -= guarda[k] * (pac * pacote[k] - qs[j]);
+        estoque[k] = tem + pac * pacote[k] - qs[j];
       }
+      gastoEfetivo = Math.max(0, gastoEfetivo);
+      hist.registrar(v, slots[i]);
       keys.push(v.key);
     }
     const av = avaliar(keys, slots, getV, prefs, tab, E);
     if (!maisBarato || av.total < maisBarato.total) maisBarato = { keys, ...av };
     if (av.total <= B + 1e-9 && (!melhor || av.score > melhor.score)) melhor = { keys, ...av };
   }
-  if (melhor) melhor = melhorar(melhor, prefs, cands, slots, getV, tab, E);
   return { melhor, maisBarato, getV };
 }
 
+/** Busca local: troca uma refeição por vez enquanto a nota do cardápio sobe (contas incrementais). */
 function melhorar(plano: { keys: string[]; score: number; total: number }, prefs: Preferencias, cands: Partial<Record<Refeicao, Variante[]>>, slots: Slot[], getV: (k: string) => Variante, tab: Tabela, E: Estilo) {
-  let atual = plano;
+  const H = prefs.pessoas, B = prefs.orcamento, emCasa = new Set(prefs.despensa);
+  const keys = plano.keys.slice();
+  const vs = keys.map(getV);
+  const nec = new Map<string, number>();
+  for (const v of vs) for (const l of v.linhas) if (!emCasa.has(l.id)) nec.set(l.id, (nec.get(l.id) || 0) + l.q * H);
+  /** [custo, desperdício, guardado] de comprar q do item. */
+  const conta = (id: string, q: number): [number, number, number] => {
+    if (q <= 1e-9) return [0, 0, 0];
+    const c = melhorCompra(id, q, tab);
+    const sobra = c.comprado > 0 ? c.custo * (1 - q / c.comprado) : 0;
+    return PERECIVEIS.has(ITEM[id].secao) ? [c.custo, sobra, 0] : [c.custo, 0, sobra];
+  };
+  let total = 0, desp = 0, guard = 0;
+  for (const [id, q] of nec) { const [c, d, g] = conta(id, q); total += c; desp += d; guard += g; }
+  const usos = new Map<string, number>();
+  for (const v of vs) usos.set(v.rid, (usos.get(v.rid) || 0) + 1);
+  const hist = new Historico(E);
+  let pratos = notaPratos(vs, slots, E, hist);
+  const tetoP = (E.alvo * B) / H;
+  const nota = (p: number, t: number, d: number, g: number, distintos: number) =>
+    p - pesoGasto((t - E.guarda * g) / H, tetoP, E) - (E.desperdicio * d) / H + E.distintos * distintos;
+  let score = nota(pratos, total, desp, guard, usos.size);
+  // Só as receitas mais bem avaliadas de cada refeição entram na busca local.
+  const topo: Partial<Record<Refeicao, Variante[]>> = {};
+  for (const r in cands) topo[r as Refeicao] = [...cands[r as Refeicao]!].sort((a, b) => b.score - a.score).slice(0, 45);
+
   for (let passe = 0; passe < 2; passe++) {
     let mudou = false;
     for (let i = 0; i < slots.length; i++) {
-      for (const v of cands[slots[i].r]!) {
-        if (v.key === atual.keys[i]) continue;
-        const keys = atual.keys.slice();
-        keys[i] = v.key;
-        const av = avaliar(keys, slots, getV, prefs, tab, E);
-        if (av.total <= prefs.orcamento + 1e-9 && av.score > atual.score + 1e-6) { atual = { keys, ...av }; mudou = true; }
+      for (const v of topo[slots[i].r]!) {
+        const a = vs[i];
+        if (v.key === a.key) continue;
+        const delta = new Map<string, number>();
+        for (const l of a.linhas) if (!emCasa.has(l.id)) delta.set(l.id, (delta.get(l.id) || 0) - l.q * H);
+        for (const l of v.linhas) if (!emCasa.has(l.id)) delta.set(l.id, (delta.get(l.id) || 0) + l.q * H);
+        let t = total, d = desp, g = guard;
+        for (const [id, dq] of delta) {
+          if (Math.abs(dq) < 1e-9) continue;
+          const q0 = nec.get(id) || 0;
+          const [c0, d0, g0] = conta(id, q0), [c1, d1, g1] = conta(id, q0 + dq);
+          t += c1 - c0; d += d1 - d0; g += g1 - g0;
+        }
+        if (t > B + 1e-9) continue;
+        vs[i] = v;
+        const p = notaPratos(vs, slots, E, hist);
+        const distintos = usos.size - (a.rid !== v.rid && usos.get(a.rid) === 1 ? 1 : 0) + (a.rid !== v.rid && !usos.get(v.rid) ? 1 : 0);
+        const sc = nota(p, t, d, g, distintos);
+        if (sc > score + 1e-6) {
+          for (const [id, dq] of delta) nec.set(id, (nec.get(id) || 0) + dq);
+          usos.set(a.rid, usos.get(a.rid)! - 1);
+          if (!usos.get(a.rid)) usos.delete(a.rid);
+          usos.set(v.rid, (usos.get(v.rid) || 0) + 1);
+          keys[i] = v.key;
+          total = t; desp = d; guard = g; pratos = p; score = sc;
+          mudou = true;
+        } else vs[i] = a;
       }
     }
     if (!mudou) break;
   }
-  return atual;
+  return { keys, ...avaliar(keys, slots, getV, prefs, tab, E) };
 }
 
-/** Monta o plano. Com `reais`, os preços de notas fiscais substituem as estimativas. */
-export function planejar(prefs: Preferencias, semente: number, reais?: PrecosReais): Plano | Problema {
+/** Monta o plano. `fontes` traz os preços de notas fiscais e dos sites (sem elas, só estimativas). */
+export function planejar(prefs: Preferencias, semente: number, fontes?: FontesPreco): Plano | Problema {
   const slots = slotsDe(prefs);
-  const { cands, stats } = candidatos(prefs);
-  for (const r of ORDEM_REFEICOES) if (cands[r] && !cands[r]!.length) return { ok: false, motivo: 'receitas', refeicao: r, stats };
+  const { cands: base, stats } = candidatos(prefs);
+  for (const r of ORDEM_REFEICOES) if (base[r] && !base[r]!.length) return { ok: false, motivo: 'receitas', refeicao: r, stats };
   const E = ESTILOS[prefs.estilo];
-  const barato = { ...ESTILOS.economia, lambda: 6, ruido: 0.3 };
+  // "Sabor da semana": cada semente favorece algumas receitas, então cada plano refeito explora outras combinações.
+  const cands: typeof base = {};
+  for (const r in base) {
+    cands[r as Refeicao] = base[r as Refeicao]!.map(v => ({ ...v, score: v.score + E.sabor * ((hash(semente + ':' + v.rid) % 2001) / 1000 - 1) }));
+  }
+  const barato = { ...ESTILOS.economia, lambda: 6, lambdaAlto: 6, ruido: 0.3 };
   const contextos = prefs.modo === 'dividir' ? [prefs.mercados] : prefs.mercados.map(m => [m]);
   let melhor: { keys: string[]; score: number; mercados: string[] } | null = null;
   let maisBarato: { total: number } | null = null;
   let rodadas = 0;
   contextos.forEach((mercados, ci) => {
-    const tab = tabela(mercados, reais);
+    const tab = tabela(mercados, fontes);
     const r1 = buscar(prefs, cands, slots, tab, semente * 31 + ci, E, 110);
     const r2 = buscar(prefs, cands, slots, tab, semente * 31 + ci + 7, barato, 30);
     rodadas += 140;
+    let local: { keys: string[]; score: number; total: number } | null = null;
     for (const r of [r1, r2]) {
       if (r.melhor) {
-        const av = avaliar(r.melhor.keys, slots, r.getV, prefs, tab, E);
-        if (!melhor || av.score > melhor.score) melhor = { keys: r.melhor.keys, score: av.score, mercados };
+        const av = avaliar(r.melhor.keys, slots, r1.getV, prefs, tab, E);
+        if (!local || av.score > local.score) local = { keys: r.melhor.keys, ...av };
       }
       if (r.maisBarato && (!maisBarato || r.maisBarato.total < maisBarato.total)) maisBarato = { total: r.maisBarato.total };
+    }
+    if (local) {
+      const m = melhorar(local, prefs, cands, slots, r1.getV, tab, E);
+      if (!melhor || m.score > melhor.score) melhor = { keys: m.keys, score: m.score, mercados };
     }
   });
   if (!melhor) return { ok: false, motivo: 'orcamento', minimo: (maisBarato as { total: number } | null)?.total ?? 0, stats };
   const m = melhor as { keys: string[]; mercados: string[] };
-  return finalizar(prefs, m.keys, m.mercados, {}, { semente, rodadas, stats }, reais);
+  return finalizar(prefs, m.keys, m.mercados, {}, { semente, rodadas, stats }, fontes);
 }
 
 export function obterVariante(key: string, prefs: Preferencias, custom: Record<string, Variante>): Variante | null {
@@ -357,14 +510,14 @@ export function obterVariante(key: string, prefs: Preferencias, custom: Record<s
 }
 
 /** Tudo o que as telas precisam a partir das escolhas. */
-export function finalizar(prefs: Preferencias, keys: string[], mercados: string[], custom: Record<string, Variante>, meta: Plano['meta'], reais?: PrecosReais): Plano {
+export function finalizar(prefs: Preferencias, keys: string[], mercados: string[], custom: Record<string, Variante>, meta: Plano['meta'], fontes?: FontesPreco): Plano {
   const slots = slotsDe(prefs);
   const vmap: Record<string, Variante> = {};
   for (const k of keys) if (!vmap[k]) vmap[k] = obterVariante(k, prefs, custom)!;
   const vs = keys.map(k => vmap[k]);
-  const custo = custoDe(vs, prefs, tabela(mercados, reais));
-  const porMercado = prefs.mercados.map(m => ({ mercado: m, total: custoDe(vs, prefs, tabela([m], reais)).total }));
-  const dividido = custoDe(vs, prefs, tabela(prefs.mercados, reais)).total;
+  const custo = custoDe(vs, prefs, tabela(mercados, fontes));
+  const porMercado = prefs.mercados.map(m => ({ mercado: m, total: custoDe(vs, prefs, tabela([m], fontes)).total }));
+  const dividido = custoDe(vs, prefs, tabela(prefs.mercados, fontes)).total;
   const dias: Plano['dias'] = [];
   const soma = { kcal: 0, p: 0, c: 0, g: 0 };
   slots.forEach((s, i) => {
@@ -381,11 +534,11 @@ export function finalizar(prefs: Preferencias, keys: string[], mercados: string[
 }
 
 /** Troca uma refeição pela melhor outra receita que mantém o plano no orçamento. */
-export function trocar(plano: Plano, i: number, jaTentadas: string[], reais?: PrecosReais): Plano | null {
+export function trocar(plano: Plano, i: number, jaTentadas: string[], fontes?: FontesPreco): Plano | null {
   const prefs = plano.prefs;
   const { cands } = candidatos(prefs);
   const E = ESTILOS[prefs.estilo];
-  const tab = tabela(plano.mercados, reais);
+  const tab = tabela(plano.mercados, fontes);
   const todas: Record<string, Variante> = { ...plano.custom };
   for (const r in cands) for (const v of cands[r as Refeicao]!) todas[v.key] = v;
   const getV = (k: string) => todas[k] || plano.vmap[k];
@@ -399,5 +552,5 @@ export function trocar(plano: Plano, i: number, jaTentadas: string[], reais?: Pr
     if (av.total <= prefs.orcamento + 1e-9 && (!melhor || av.score > melhor.score)) melhor = { keys, score: av.score };
   }
   if (!melhor) return null;
-  return finalizar(prefs, melhor.keys, plano.mercados, plano.custom, plano.meta, reais);
+  return finalizar(prefs, melhor.keys, plano.mercados, plano.custom, plano.meta, fontes);
 }

@@ -82,6 +82,8 @@ export interface Receita {
   sobra?: boolean;
   /** Algum destes aparelhos é obrigatório (além dos métodos). */
   requer?: string[];
+  /** Ajuste de popularidade: pratos que dividem opiniões (fígado, quiabo) ficam negativos. */
+  peso?: number;
 }
 
 export interface Preferencias {

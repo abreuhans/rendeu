@@ -37,7 +37,7 @@ describe('dados', () => {
     }
     for (const d of DESPENSA) for (const id of d.itens) if (!ITEM[id]) erros.push(`despensa ${id}`);
     expect(erros).toEqual([]);
-    expect(RECEITAS.length).toBeGreaterThanOrEqual(80);
+    expect(RECEITAS.length).toBeGreaterThanOrEqual(200);
   });
 
   it('preços seguem o padrão de gôndola e variam por mercado', () => {

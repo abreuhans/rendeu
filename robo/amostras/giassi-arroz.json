@@ -1,0 +1,713 @@
+{
+ "recordsFiltered": 50,
+ "products": [
+  {
+   "productId": "12",
+   "productName": "Arroz Parboilizado Tipo 1 Giassi Pacote 1kg",
+   "brand": "Giassi",
+   "link": "/arroz_parboilizado_tipo_1_giassi_pacote_1kg_9889019/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "12",
+     "name": "Arroz Parboilizado Tipo 1 Giassi Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 3.78,
+        "ListPrice": 3.78,
+        "PriceWithoutDiscount": 3.78,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "415",
+   "productName": "Arroz Branco Tipo 1 Giassi Pacote 1kg",
+   "brand": "Giassi",
+   "link": "/arroz_branco_tipo_1_giassi_pacote_1kg_4000331/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "415",
+     "name": "Arroz Branco Tipo 1 Giassi Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 3.88,
+        "ListPrice": 3.88,
+        "PriceWithoutDiscount": 3.88,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "9443",
+   "productName": "Arroz Branco Tipo 1 Tio Urbano Seleção Especial Pacote 1kg",
+   "brand": "Urbano",
+   "link": "/arroz_branco_tipo_1_tio_urbano_selecao_especial_pacote_1kg_9810870/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "9443",
+     "name": "Arroz Branco Tipo 1 Tio Urbano Seleção Especial Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 5.38,
+        "ListPrice": 5.38,
+        "PriceWithoutDiscount": 5.38,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "9363",
+   "productName": "Arroz Parboilizado Tipo 1 Urbano Seleção Especial Pacote 1kg",
+   "brand": "Urbano",
+   "link": "/arroz_parboilizado_tipo_1_urbano_selecao_especial_pacote_1kg_9811338/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "9363",
+     "name": "Arroz Parboilizado Tipo 1 Urbano Seleção Especial Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 4.48,
+        "ListPrice": 4.68,
+        "PriceWithoutDiscount": 4.48,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "13328",
+   "productName": "Arroz Polido Tipo 1 Tio João 100% Grãos Nobres Pacote 1kg",
+   "brand": "Tio João",
+   "link": "/arroz_polido_tipo_1_tio_joao_100_graos_nobres_pacote_1kg_1138839/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "13328",
+     "name": "Arroz Polido Tipo 1 Tio João 100% Grãos Nobres Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 8.18,
+        "ListPrice": 8.18,
+        "PriceWithoutDiscount": 8.18,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "354",
+   "productName": "Arroz Parboilizado Tipo 1 Giassi Pacote 5kg",
+   "brand": "Giassi",
+   "link": "/arroz_parboilizado_tipo_1_giassi_pacote_5kg_9888985/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "5,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "354",
+     "name": "Arroz Parboilizado Tipo 1 Giassi Pacote 5kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 18.6,
+        "ListPrice": 18.6,
+        "PriceWithoutDiscount": 18.6,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "13387",
+   "productName": "Arroz Parboilizado Tipo 1 Tio João Pacote 1kg",
+   "brand": "Tio João",
+   "link": "/arroz_parboilizado_tipo_1_tio_joao_pacote_1kg_5692679/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "13387",
+     "name": "Arroz Parboilizado Tipo 1 Tio João Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 6.78,
+        "ListPrice": 6.78,
+        "PriceWithoutDiscount": 6.78,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "353",
+   "productName": "Arroz Parboilizado Tipo 1 Kiarroz Pacote 1kg",
+   "brand": "Kiarroz",
+   "link": "/arroz_parboilizado_tipo_1_kiarroz_pacote_1kg_123412/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "353",
+     "name": "Arroz Parboilizado Tipo 1 Kiarroz Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 3.88,
+        "ListPrice": 3.88,
+        "PriceWithoutDiscount": 3.88,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "9425",
+   "productName": "Arroz Branco Tipo 1 Tio Urbano Seleção Especial Pacote 5kg",
+   "brand": "Urbano",
+   "link": "/arroz_branco_tipo_1_tio_urbano_selecao_especial_pacote_5kg_9810951/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "5,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "9425",
+     "name": "Arroz Branco Tipo 1 Tio Urbano Seleção Especial Pacote 5kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 26.36,
+        "ListPrice": 26.36,
+        "PriceWithoutDiscount": 26.36,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "332",
+   "productName": "Arroz Branco Tipo 1 Giassi Pacote 5kg",
+   "brand": "Giassi",
+   "link": "/arroz_branco_tipo_1_giassi_pacote_5kg_4000250/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "5,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "332",
+     "name": "Arroz Branco Tipo 1 Giassi Pacote 5kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 19.09,
+        "ListPrice": 19.09,
+        "PriceWithoutDiscount": 19.09,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "13414",
+   "productName": "Arroz Integral Tipo 1 Urbano Pacote 1kg",
+   "brand": "Urbano",
+   "link": "/arroz_integral_tipo_1_urbano_pacote_1kg_9811257/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/",
+    "/Alimentos Especiais/",
+    "/Alimentos Especiais/Integrais/",
+    "/Alimentos Especiais/Integrais/Arroz/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "13414",
+     "name": "Arroz Integral Tipo 1 Urbano Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 5.78,
+        "ListPrice": 5.78,
+        "PriceWithoutDiscount": 5.78,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "419",
+   "productName": "Arroz Branco Tipo 1 Kiarroz Pacote 1kg",
+   "brand": "Kiarroz",
+   "link": "/arroz_branco_tipo_1_kiarroz_pacote_1kg_123358/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "419",
+     "name": "Arroz Branco Tipo 1 Kiarroz Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 4.08,
+        "ListPrice": 4.08,
+        "PriceWithoutDiscount": 4.08,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "11164",
+   "productName": "Arroz Branco Tipo 1 Urbano Premium Pacote 1kg",
+   "brand": "Urbano",
+   "link": "/arroz_branco_tipo_1_urbano_premium_pacote_1kg_767492/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "11164",
+     "name": "Arroz Branco Tipo 1 Urbano Premium Pacote 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 5.88,
+        "ListPrice": 5.88,
+        "PriceWithoutDiscount": 5.88,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "367",
+   "productName": "Arroz Arbório Tipo 1 Campanini Caixa 1kg",
+   "brand": "Campanini",
+   "link": "/arroz_arborio_tipo_1_campanini_caixa_1kg_813125/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "367",
+     "name": "Arroz Arbório Tipo 1 Campanini Caixa 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 26.9,
+        "ListPrice": 26.9,
+        "PriceWithoutDiscount": 26.9,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "productId": "12362",
+   "productName": "Arroz Arbório Tipo 1 Urbano Seleção Especial Pouch 1kg",
+   "brand": "Urbano",
+   "link": "/arroz_arborio_tipo_1_urbano_selecao_especial_pouch_1kg_159590/p",
+   "categories": [
+    "/Mercearia/Alimentos Básicos/Arroz/",
+    "/Mercearia/Alimentos Básicos/",
+    "/Mercearia/"
+   ],
+   "properties": [
+    {
+     "name": "multiplicador",
+     "originalName": "multiplicador",
+     "values": [
+      "1,00000"
+     ]
+    },
+    {
+     "name": "unidade",
+     "originalName": "unidade",
+     "values": [
+      "kg"
+     ]
+    }
+   ],
+   "items": [
+    {
+     "itemId": "12362",
+     "name": "Arroz Arbório Tipo 1 Urbano Seleção Especial Pouch 1kg",
+     "measurementUnit": "un",
+     "unitMultiplier": 1,
+     "sellers": [
+      {
+       "sellerId": "1",
+       "sellerDefault": true,
+       "commertialOffer": {
+        "Price": 23.9,
+        "ListPrice": 23.9,
+        "PriceWithoutDiscount": 23.9,
+        "AvailableQuantity": 10000
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

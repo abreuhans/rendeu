@@ -1,0 +1,199 @@
+{
+ "hits": [
+  {
+   "id": "7064149",
+   "name": "Arroz Tio Urbano Branco Pacote 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 5.29,
+    "promotion": false,
+    "promotionalPrice": 5.29,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 262
+   },
+   "salesCount": 2589
+  },
+  {
+   "id": "7064136",
+   "name": "Arroz Kika Parboilizado Pacote 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 3.59,
+    "promotion": false,
+    "promotionalPrice": 3.59,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 588
+   },
+   "salesCount": 1821
+  },
+  {
+   "id": "7064133",
+   "name": "Arroz Kika Branco Pacote 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 3.79,
+    "promotion": false,
+    "promotionalPrice": 3.79,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 314
+   },
+   "salesCount": 1206
+  },
+  {
+   "id": "7064159",
+   "name": "Arroz Urbano Parboilizado Pacote 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 4.79,
+    "promotion": false,
+    "promotionalPrice": 4.79,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 157
+   },
+   "salesCount": 872
+  },
+  {
+   "id": "7064146",
+   "name": "Arroz Tio João Branco Pacote 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 7.99,
+    "promotion": false,
+    "promotionalPrice": 7.99,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 141
+   },
+   "salesCount": 521
+  },
+  {
+   "id": "7075771",
+   "name": "Salame tipo Italiano Fatiado Seara Gourmet 100G",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 11.99,
+    "promotion": false,
+    "promotionalPrice": 11.99,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 161
+   },
+   "salesCount": 413
+  },
+  {
+   "id": "7064157",
+   "name": "Arroz Urbano Integral 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 4.99,
+    "promotion": false,
+    "promotionalPrice": 4.99,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 102
+   },
+   "salesCount": 341
+  },
+  {
+   "id": "7273681",
+   "name": "FEIJÃO PÉ VERMELHO VERMELHO TIPO1 PC 1KG",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 9.99,
+    "promotion": true,
+    "promotionalPrice": 8.99,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 18
+   },
+   "salesCount": 234
+  },
+  {
+   "id": "7069471",
+   "name": "Farinha De Trigo Anaconda Tipo 1 Pacote 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 4.49,
+    "promotion": false,
+    "promotionalPrice": 4.49,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 20
+   },
+   "salesCount": 150
+  },
+  {
+   "id": "7074786",
+   "name": "Queijo Tipo Brie Cruzília 115G",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 21.99,
+    "promotion": false,
+    "promotionalPrice": 21.99,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 44
+   },
+   "salesCount": 18
+  },
+  {
+   "id": "7651546",
+   "name": "Feijão Reserva Carioca Tipo1 Pacote com 1Kg",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 7.99,
+    "promotion": false,
+    "promotionalPrice": 7.99,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 28
+   },
+   "salesCount": 177
+  },
+  {
+   "id": "7074791",
+   "name": "Queijo Tipo Grana Rar Lascas 150G",
+   "saleUnit": "UN",
+   "contentUnit": "UN",
+   "pricing": {
+    "price": 43.9,
+    "promotion": false,
+    "promotionalPrice": 43.9,
+    "store": 1411
+   },
+   "quantity": {
+    "inStock": 18
+   },
+   "salesCount": 2
+  }
+ ],
+ "total": 41,
+ "nextFrom": 12,
+ "hasNext": true
+}

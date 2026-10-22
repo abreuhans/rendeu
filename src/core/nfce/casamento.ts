@@ -19,11 +19,14 @@ const REGRAS: [string, RegExp, RegExp?][] = [
   ['batata_palha', /BATATA.*PALHA/],
   ['batata_doce', /BATATA[ -]?DOCE|BAT\.? DOCE/],
   ['pao_queijo', /PAO.*QUEIJO/],
+  ['coco_ralado', /COCO.*RALADO|RALADO.*COCO/],
   ['leite_coco', /LEITE.*COCO/],
   ['creme_leite', /CREME.*LEITE|CR\.? ?LEITE/],
   ['farinha_mandioca', /FAR(INHA|\.)?.*MAND/],
   ['farinha_trigo', /FAR(INHA|\.)?.*TRIGO/],
   ['massa_lasanha', /LASANHA/, /PRONTA|CONGEL|BOLONH/],
+  ['massa_pastel', /PASTEL/, /FORNO|ASSADO|PRONTO|CONGEL/],
+  ['macarrao_instantaneo', /INSTANT|LAMEN|MIOJO|NISSIN|CUP NOODLES/, /COPO/],
   ['macarrao', /MACARRAO|\bMAC\b|ESPAGUET|ESPAG\b|PARAFUSO|PENNE|FUSILLI|TALHARIM/, /INSTANT|LAMEN|MIOJO|NISSIN|COPO/],
   ['milho_pipoca', /PIPOCA/],
   ['milho_lata', /MILHO/, /PIPOCA|FUBA|FLOC|CANJICA|SUCRILHOS/],
@@ -33,6 +36,8 @@ const REGRAS: [string, RegExp, RegExp?][] = [
   ['granola', /GRANOLA/],
   ['aveia', /AVEIA/],
   ['arroz', /\bARROZ\b/, /INTEGRAL|ARBORIO|JAPON|BISC|FARINHA|DOCE/],
+  ['grao_bico', /GRAO.?DE.?BICO|GRAO BICO/],
+  ['lentilha', /LENTILHA/],
   ['feijao_preto', /FEIJ.*(PRETO|\bPTO\b)/],
   ['feijao_carioca', /FEIJ.*(CARIOCA|\bCAR\b|\bCARIOQ)/],
   ['acucar', /ACUCAR|ACUC\b/, /MASCAVO|DEMERARA|CONFEIT/],
@@ -50,7 +55,9 @@ const REGRAS: [string, RegExp, RegExp?][] = [
   ['cafe', /\bCAFE\b/, /CAPSULA|SOLUVEL|FILTRO|BISC/],
   ['caldo_galinha', /CALDO.*GALINHA/],
   ['fermento', /FERMENTO/, /BIOLOG/],
-  ['colorau', /COLORAU|COLORIFICO|PAPRICA/],
+  ['paprica', /PAPRICA/],
+  ['curry', /CURRY/],
+  ['colorau', /COLORAU|COLORIFICO/],
   ['oregano', /OREGANO/],
   ['cominho', /COMINHO/],
   ['pimenta_reino', /PIMENTA.*REINO/],
@@ -61,6 +68,7 @@ const REGRAS: [string, RegExp, RegExp?][] = [
   ['pao_frances', /PAO (FRANCES|FRANC|DE SAL|D SAL|TIPO FRANCES|CARIOCA)/],
   ['ovos', /\bOVOS?\b/, /PASCOA|CHOCOLATE|CODORNA/],
   ['requeijao', /REQUEIJAO|\bREQ\b/],
+  ['ricota', /RICOTA/],
   ['mussarela', /MUSSARELA|MUCARELA|MOZZARELLA|\bMUSS\b/],
   ['queijo_minas', /MINAS|FRESCAL/],
   ['parmesao', /PARMESAO|QUEIJO RALADO/],
@@ -70,7 +78,12 @@ const REGRAS: [string, RegExp, RegExp?][] = [
   ['leite', /\bLEITE\b/, /CONDENS|\bPO\b|EM PO|FERMENT|ACHOC|CHOC|DOCE|BISC|SORVETE|\bBEB/],
   ['presunto', /PRESUNTO/],
   ['peito_frango', /PEITO.*FRANGO|FILE.*PEITO|FILE DE FRANGO|SASSAMI/],
+  ['asa_frango', /(COXINHA|MEIO|TULIPA).*\bASAS?\b|\bASAS? (DE )?FRANGO/],
   ['frango_coxa', /COXA|SOBRECOXA/],
+  ['carne_seca', /CARNE.*SECA|CHARQUE|JERKED/],
+  ['figado', /FIGADO/, /FRANGO|GALINHA/],
+  ['costela', /COSTELA|PONTA (DE )?AGULHA/, /SUIN|PORCO|BARBECUE|DEFUM/],
+  ['lombo', /LOMBO/, /CANADENSE|DEFUM|COZIDO/],
   ['carne_moida', /MOID[AO]/],
   ['acem', /\bACEM\b/],
   ['bife', /COXAO MOLE|PATINHO|\bBIFE\b|ALCATRA|CONTRA ?FILE/],
@@ -78,11 +91,16 @@ const REGRAS: [string, RegExp, RegExp?][] = [
   ['linguica', /LINGUICA|\bLING\b/],
   ['bisteca', /BISTECA/],
   ['salsicha', /SALSICHA/],
+  ['bacon', /BACON/, /SABOR|BATATA|SALGAD|BISC/],
   ['tilapia', /TILAPIA/],
   ['merluza', /MERLUZA/],
   ['camarao', /CAMARAO/],
+  ['marisco', /MARISCO|MEXILHAO/],
   ['banana', /BANANA/],
   ['maca', /\bMACA\b/],
+  ['mamao', /MAMAO|PAPAIA|PAPAYA/],
+  ['laranja', /LARANJA/, /SUCO|NECTAR|REFRIG|\bBEB|GELEIA|DOCE|BOLO|BISC/],
+  ['abacate', /ABACATE/],
   ['limao', /LIMAO/],
   ['tomate', /\bTOMATE\b/, /MOLHO|EXTRATO|POLPA|SECO|PELADO|PASSATA/],
   ['cebola', /\bCEBOLA\b/],
@@ -92,6 +110,12 @@ const REGRAS: [string, RegExp, RegExp?][] = [
   ['abobrinha', /ABOBRINHA/],
   ['abobora', /ABOBORA|CABOTIA/],
   ['chuchu', /CHUCHU/],
+  ['berinjela', /BERINJELA|BERINGELA/],
+  ['beterraba', /BETERRABA/],
+  ['pepino', /PEPINO/, /CONSERVA/],
+  ['quiabo', /QUIABO/],
+  ['vagem', /\bVAGEM\b/],
+  ['espinafre', /ESPINAFRE/],
   ['pimentao', /PIMENTAO/],
   ['brocolis', /BROCOLI/],
   ['repolho', /REPOLHO/],
@@ -130,11 +154,17 @@ export interface Casamento {
   como: string;
 }
 
-export function casarItem(linha: ItemNota): Casamento | null {
-  const desc = normalizar(linha.descricao);
+/** Item do catálogo que a descrição do produto representa (a primeira regra que bate). */
+export function itemDaDescricao(descricao: string): string | null {
+  const desc = normalizar(descricao);
   const regra = REGRAS.find(([, inc, exc]) => inc.test(desc) && !(exc && exc.test(desc)));
-  if (!regra || !(linha.valorUnitario > 0)) return null;
-  const it = ITEM[regra[0]];
+  return regra ? regra[0] : null;
+}
+
+export function casarItem(linha: ItemNota): Casamento | null {
+  const id = itemDaDescricao(linha.descricao);
+  if (!id || !(linha.valorUnitario > 0)) return null;
+  const it = ITEM[id];
   const unidadeNota = normalizar(linha.unidade);
   // Vendido por peso (hortifrúti, carnes, pão francês): o valor unitário é por kg.
   if (POR_PESO.test(unidadeNota)) {
